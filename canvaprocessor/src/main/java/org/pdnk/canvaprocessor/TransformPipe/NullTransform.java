@@ -17,6 +17,12 @@ public class NullTransform extends BaseTransformPipe<DataDescriptor>
     }
 
     @Override
+    public boolean canCacheInput()
+    {
+        return true;
+    }
+
+    @Override
     public void prepare()
     {
         //nothing to prepare

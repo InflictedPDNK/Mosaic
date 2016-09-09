@@ -25,6 +25,11 @@ public class ReverseTransform extends BaseTransformPipe<DataDescriptor>
         return data;
     }
 
+    @Override
+    public boolean canCacheInput()
+    {
+        return true;
+    }
 
     @Override
     public void prepare()

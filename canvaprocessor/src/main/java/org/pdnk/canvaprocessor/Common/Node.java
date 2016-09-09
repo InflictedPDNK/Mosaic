@@ -14,4 +14,6 @@ public interface Node extends Reportable
 
     boolean canCacheOutput();
     boolean canCacheInput();
+    boolean isInputCacheValid();
+    boolean isOutputCacheValid();
 }

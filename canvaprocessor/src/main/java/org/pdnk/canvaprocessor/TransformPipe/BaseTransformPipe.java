@@ -1,5 +1,8 @@
 package org.pdnk.canvaprocessor.TransformPipe;
 
+import android.util.Log;
+
+import org.pdnk.canvaprocessor.Common.Constants;
 import org.pdnk.canvaprocessor.Common.Consumable;
 import org.pdnk.canvaprocessor.Common.ParametricRunnable;
 import org.pdnk.canvaprocessor.Data.DataDescriptor;
@@ -17,10 +20,13 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> implements Tra
     Consumable consumer;
     DataDescriptor cachedOutputData;
     DataDescriptor cachedInputData;
+    boolean partillyCompleted;
 
     @Override
     public void consume(final DataDescriptor data)
     {
+        Log.d(Constants.MAIN_TAG, "\tTransforming data by " + getClass().getSimpleName());
+
         procThread = new Thread(new Runnable()
         {
             @Override
@@ -50,26 +56,39 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> implements Tra
     @Override
     public void run()
     {
+        Log.d(Constants.MAIN_TAG,
+              String.format("\tTransforming data by %s", this.getClass().getSimpleName()));
+
+
         if(!canCacheInput() || cachedInputData == null)
-            completedFeedbackListener.run(new CompletedFeedback(false, false, "Can't run transform because input data is empty or caching disabled"));
-
-        procThread = new Thread(new Runnable()
         {
-            @Override
-            public void run()
-            {
-                T dataToTransform = (T) cachedInputData.clone();
+            completedFeedbackListener.run(new CompletedFeedback(false,
+                                                                false,
+                                                                "Can't run transform because input data is empty or caching disabled"));
+        }else
+        {
 
-                process(dataToTransform);
-            }
-        });
-        procThread.run();
+
+            procThread = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    T dataToTransform = (T) cachedInputData.clone();
+
+                    process(dataToTransform);
+                }
+            });
+            procThread.run();
+        }
     }
 
     private void process(DataDescriptor data)
     {
         try
         {
+            partillyCompleted = false;
+
             T dataToSend = transformData((T) data);
 
             if (canCacheOutput() && !Thread.currentThread().isInterrupted())
@@ -82,12 +101,12 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> implements Tra
 
             if (!Thread.currentThread().isInterrupted())
             {
-                completedFeedbackListener.run(new CompletedFeedback(true, false, null));
+                completedFeedbackListener.run(new CompletedFeedback(true, partillyCompleted, null));
             }
         } catch (IOException | ClassCastException e)
         {
             if (!Thread.currentThread().isInterrupted())
-                completedFeedbackListener.run(new CompletedFeedback(false, false, e.getMessage()));
+                completedFeedbackListener.run(new CompletedFeedback(false, partillyCompleted, e.getMessage()));
 
         }
     }
@@ -122,6 +141,18 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> implements Tra
     }
 
     @Override
+    public final boolean isInputCacheValid()
+    {
+        return cachedInputData != null;
+    }
+
+    @Override
+    public final boolean isOutputCacheValid()
+    {
+        return cachedOutputData != null;
+    }
+
+    @Override
     public void addConsumer(Consumable consumableNode)
     {
         consumer = consumableNode;
@@ -133,5 +164,12 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> implements Tra
         this.completedFeedbackListener = completedFeedbackListener;
     }
 
+    protected void setPartiallyCompleted()
+    {
+        partillyCompleted = true;
+    }
+
     abstract T transformData(T data) throws IOException;
+
+
 }

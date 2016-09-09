@@ -1,5 +1,8 @@
 package org.pdnk.canvaprocessor.SinkNode;
 
+import android.util.Log;
+
+import org.pdnk.canvaprocessor.Common.Constants;
 import org.pdnk.canvaprocessor.Common.ParametricRunnable;
 import org.pdnk.canvaprocessor.Data.DataDescriptor;
 import org.pdnk.canvaprocessor.Feedback.CompletedFeedback;
@@ -13,16 +16,19 @@ abstract class BaseSinkNode<T extends DataDescriptor> implements SinkNode
 {
     ParametricRunnable<CompletedFeedback> completedFeedbackListener;
     Thread procThread;
-    T cachedData;
+    T cachedOutputData;
 
     @Override
     public final void consume(final DataDescriptor data)
     {
+        Log.d(Constants.MAIN_TAG, "\tRendering data by " + getClass().getSimpleName());
+
         procThread = new Thread(new Runnable()
         {
             @Override
             public void run()
             {
+
                 if(data == null)
                 {
                     completedFeedbackListener.run(new CompletedFeedback(false,
@@ -34,7 +40,7 @@ abstract class BaseSinkNode<T extends DataDescriptor> implements SinkNode
                     try
                     {
                         if(canCacheOutput())
-                            cachedData = (T) renderData(data).clone();
+                            cachedOutputData = (T) renderData(data).clone();
 
                         if (!Thread.currentThread().isInterrupted())
                         {
@@ -72,7 +78,7 @@ abstract class BaseSinkNode<T extends DataDescriptor> implements SinkNode
     @Override
     public final DataDescriptor readOutput()
     {
-        return cachedData;
+        return cachedOutputData;
     }
 
     @Override
@@ -85,6 +91,18 @@ abstract class BaseSinkNode<T extends DataDescriptor> implements SinkNode
     public final boolean canCacheInput()
     {
         return false;
+    }
+
+    @Override
+    public final boolean isInputCacheValid()
+    {
+        return false;
+    }
+
+    @Override
+    public final boolean isOutputCacheValid()
+    {
+        return cachedOutputData != null;
     }
 
     @Override

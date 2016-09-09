@@ -1,7 +1,9 @@
 package org.pdnk.canvaprocessor.Graph;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
+import org.pdnk.canvaprocessor.Common.Constants;
 import org.pdnk.canvaprocessor.Common.Node;
 import org.pdnk.canvaprocessor.Common.ParametricRunnable;
 import org.pdnk.canvaprocessor.Common.Produceable;
@@ -45,12 +47,16 @@ public class Graph
 
     public void pushTransform(@NonNull TransformPipe pipe) throws IllegalStateException
     {
+        failIfImmutable();
         failIfRunning();
 
         if(descriptor.transforms == null)
             descriptor.transforms = new LinkedList<>();
 
         descriptor.transforms.add(pipe);
+
+        if(path != null)
+            connectNodes();
     }
 
     public TransformPipe peekTransform() throws IllegalStateException
@@ -63,12 +69,16 @@ public class Graph
 
     public TransformPipe popTransform() throws IllegalStateException
     {
+        failIfImmutable();
         failIfRunning();
 
         if(descriptor.transforms == null || descriptor.transforms.isEmpty())
             return null;
 
         descriptor.transforms.removeLast();
+
+        if(path != null)
+            connectNodes();
 
         return peekTransform();
     }
@@ -100,36 +110,38 @@ public class Graph
         }
         else
         {
-            TransformPipe startingNode = null;
-            Iterator<TransformPipe> it = descriptor.transforms.descendingIterator();
-            while(it.hasNext())
-            {
-                TransformPipe pipe = it.next();
-                if(pipe.canCacheInput())
-                {
-                    startingNode = pipe;
-                    break;
-                }
-            }
 
-            if(startingNode == null)
-            {
-                run();
-            }else
-            {
+            myState = State.RUNNING;
 
-                myState = State.RUNNING;
-                final TransformPipe finalStartingNode = startingNode;
-                Thread executingThread = new Thread(new Runnable()
+            Thread executingThread = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
                 {
-                    @Override
-                    public void run()
+                    int nodeCount = 0;
+                    TransformPipe startingNode = null;
+                    Iterator<TransformPipe> it = descriptor.transforms.descendingIterator();
+                    while(it.hasNext())
                     {
-                        runLastProc(finalStartingNode);
+                        ++nodeCount;
+                        TransformPipe pipe = it.next();
+                        if(pipe.canCacheInput() && pipe.isInputCacheValid())
+                        {
+                            startingNode = pipe;
+                            break;
+                        }
                     }
-                });
-                executingThread.start();
-            }
+
+                    if(startingNode == null)
+                    {
+                        runProc();
+                    }else
+                    {
+                        runLastProc(startingNode, nodeCount + 1);
+                    }
+                }
+            });
+            executingThread.start();
 
         }
 
@@ -150,7 +162,7 @@ public class Graph
         if(descriptor.transforms != null && !descriptor.transforms.isEmpty())
         {
             TransformPipe transformPipe = descriptor.transforms.getLast();
-            if(transformPipe.canCacheOutput())
+            if(transformPipe.canCacheOutput() && transformPipe.isOutputCacheValid())
                 return transformPipe.readOutput();
         }
 
@@ -161,7 +173,7 @@ public class Graph
     {
         failIfRunning();
 
-        if(descriptor.outputCacheEnabled)
+        if(descriptor.outputCacheEnabled && descriptor.sink.isOutputCacheValid())
             return descriptor.sink.readOutput();
 
         return null;
@@ -169,6 +181,8 @@ public class Graph
 
     private void runProc()
     {
+        Log.d(Constants.MAIN_TAG, "Running full graph");
+
         connectNodes();
         setupReporting();
         prepareNodes();
@@ -182,13 +196,16 @@ public class Graph
         descriptor.source.run();
     }
 
-    private void runLastProc(TransformPipe startingNode)
+    private void runLastProc(TransformPipe startingNode, int nodeCount)
     {
-        completedInFull = true;
-        completionStep = 1.f/2.f;
-        currentCompletion = 0.f;
+        Log.d(Constants.MAIN_TAG, "Running graph from last completed transform node");
 
         prepareNodes();
+        setupReporting();
+
+        completedInFull = true;
+        completionStep = 1.f/(float)nodeCount;
+        currentCompletion = 0.f;
 
         prevTimestamp = System.currentTimeMillis();
 
@@ -244,7 +261,7 @@ public class Graph
                     myState = State.IDLE;
                     stopAllNodes();
 
-                    sendCompletionFeedback(false, param.isPartial(), "Node execution failed");
+                    sendCompletionFeedback(false, param.isPartial(), param.getErrorDescription());
                 }
                 else
                 {
@@ -294,6 +311,12 @@ public class Graph
     {
         if(myState == State.RUNNING)
             throw new IllegalStateException("Can't modify graph while running");
+    }
+
+    private void failIfImmutable() throws IllegalStateException
+    {
+        if(descriptor.enableImmutableGraph)
+            throw new IllegalStateException("Can't modify graph after its creating. Use enableImmutableGraph in order to permit");
     }
 
     public static class Builder

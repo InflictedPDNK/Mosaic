@@ -11,6 +11,7 @@ import org.pdnk.canvaprocessor.Feedback.ProgressFeedback;
 import org.pdnk.canvaprocessor.Graph.Graph;
 import org.pdnk.canvaprocessor.SinkNode.ByteArraySink;
 import org.pdnk.canvaprocessor.SourceNode.ByteArraySource;
+import org.pdnk.canvaprocessor.TransformPipe.NullTransform;
 import org.pdnk.canvaprocessor.TransformPipe.ReverseTransform;
 import org.pdnk.mosaicproto.R;
 
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity
         .setSourceNode(new ByteArraySource("Test string".getBytes()))
         .setSinkNode(new ByteArraySink())
         .addTransformPipe(new ReverseTransform())
-        .addTransformPipe(new ReverseTransform())
+        .addTransformPipe(new NullTransform())
         .setEnableCacheOutput(true)
         .setOnCompletionFeedback(new ParametricRunnable<CompletedFeedback>()
         {
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run(CompletedFeedback param)
             {
-                Log.d("TEST", "Completed: " + param.isSuccessful());
+                Log.d("TEST", "Completed: " + param.isSuccessful() + " Error: " + param.getErrorDescription());
 
                 if (param.isSuccessful())
                 {
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity
                     if(!once)
                     {
                         once = true;
+                        g.pushTransform(new ReverseTransform());
                         g.runLast();
                     }
 

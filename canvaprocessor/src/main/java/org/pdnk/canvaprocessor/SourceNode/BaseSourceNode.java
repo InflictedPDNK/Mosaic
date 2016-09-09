@@ -1,5 +1,8 @@
 package org.pdnk.canvaprocessor.SourceNode;
 
+import android.util.Log;
+
+import org.pdnk.canvaprocessor.Common.Constants;
 import org.pdnk.canvaprocessor.Common.Consumable;
 import org.pdnk.canvaprocessor.Common.ParametricRunnable;
 import org.pdnk.canvaprocessor.Data.DataDescriptor;
@@ -19,6 +22,8 @@ abstract class BaseSourceNode<T extends DataDescriptor> implements SourceNode
     @Override
     public final void run()
     {
+        Log.d(Constants.MAIN_TAG, "\tProducing data by " + getClass().getSimpleName());
+
         procThread = new Thread(new Runnable()
         {
             @Override
@@ -69,13 +74,25 @@ abstract class BaseSourceNode<T extends DataDescriptor> implements SourceNode
     }
 
     @Override
-    public boolean canCacheInput()
+    public final boolean canCacheInput()
     {
         return false;
     }
 
     @Override
-    public boolean canCacheOutput()
+    public final boolean canCacheOutput()
+    {
+        return false;
+    }
+
+    @Override
+    public final boolean isInputCacheValid()
+    {
+        return false;
+    }
+
+    @Override
+    public final boolean isOutputCacheValid()
     {
         return false;
     }
