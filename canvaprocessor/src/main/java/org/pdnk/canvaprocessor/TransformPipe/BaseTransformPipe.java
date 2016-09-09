@@ -2,9 +2,9 @@ package org.pdnk.canvaprocessor.TransformPipe;
 
 import android.util.Log;
 
+import org.pdnk.canvaprocessor.Common.BaseNode;
 import org.pdnk.canvaprocessor.Common.Constants;
 import org.pdnk.canvaprocessor.Common.Consumable;
-import org.pdnk.canvaprocessor.Common.ParametricRunnable;
 import org.pdnk.canvaprocessor.Data.DataDescriptor;
 import org.pdnk.canvaprocessor.Feedback.CompletedFeedback;
 
@@ -13,14 +13,11 @@ import java.io.IOException;
 /**
  * Created by pnovodon on 9/09/2016.
  */
-public abstract class BaseTransformPipe<T extends DataDescriptor> implements TransformPipe
+public abstract class BaseTransformPipe<T extends DataDescriptor> extends BaseNode implements TransformPipe
 {
-    ParametricRunnable<CompletedFeedback> completedFeedbackListener;
-    Thread procThread;
     Consumable consumer;
-    DataDescriptor cachedOutputData;
-    DataDescriptor cachedInputData;
-    boolean partillyCompleted;
+
+    boolean partiallyCompleted;
 
     @Override
     public void consume(final DataDescriptor data)
@@ -39,16 +36,19 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> implements Tra
                                                                         "No data to consume"));
                 }else
                 {
-                    if (canCacheInput())
+                    if(!Thread.currentThread().isInterrupted())
                     {
-                        cachedInputData = data.clone();
+                        if (canCacheInput())
+                        {
+                            cachedInputData = data.clone();
+                        }
                     }
 
                     process(data);
                 }
             }
         });
-        procThread.run();
+        procThread.start();
     }
 
 
@@ -79,7 +79,7 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> implements Tra
                     process(dataToTransform);
                 }
             });
-            procThread.run();
+            procThread.start();
         }
     }
 
@@ -87,9 +87,13 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> implements Tra
     {
         try
         {
-            partillyCompleted = false;
+            partiallyCompleted = false;
 
-            T dataToSend = transformData((T) data);
+
+            T dataToSend = null;
+
+            if(!Thread.currentThread().isInterrupted())
+                dataToSend = transformData((T) data);
 
             if (canCacheOutput() && !Thread.currentThread().isInterrupted())
             {
@@ -101,26 +105,16 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> implements Tra
 
             if (!Thread.currentThread().isInterrupted())
             {
-                completedFeedbackListener.run(new CompletedFeedback(true, partillyCompleted, null));
+                completedFeedbackListener.run(new CompletedFeedback(true, partiallyCompleted, null));
             }
         } catch (IOException | ClassCastException e)
         {
             if (!Thread.currentThread().isInterrupted())
-                completedFeedbackListener.run(new CompletedFeedback(false, partillyCompleted, e.getMessage()));
+                completedFeedbackListener.run(new CompletedFeedback(false,
+                                                                    partiallyCompleted, e.getMessage()));
 
         }
     }
-
-
-    @Override
-    public void stop()
-    {
-        if(procThread != null && procThread.isAlive() && !procThread.isInterrupted())
-            procThread.interrupt();
-
-        procThread = null;
-    }
-
 
     @Override
     public DataDescriptor readOutput()
@@ -141,32 +135,14 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> implements Tra
     }
 
     @Override
-    public final boolean isInputCacheValid()
-    {
-        return cachedInputData != null;
-    }
-
-    @Override
-    public final boolean isOutputCacheValid()
-    {
-        return cachedOutputData != null;
-    }
-
-    @Override
     public void addConsumer(Consumable consumableNode)
     {
         consumer = consumableNode;
     }
 
-    @Override
-    public void setCompletedFeedbackListener(ParametricRunnable<CompletedFeedback> completedFeedbackListener)
-    {
-        this.completedFeedbackListener = completedFeedbackListener;
-    }
-
     protected void setPartiallyCompleted()
     {
-        partillyCompleted = true;
+        partiallyCompleted = true;
     }
 
     abstract T transformData(T data) throws IOException;

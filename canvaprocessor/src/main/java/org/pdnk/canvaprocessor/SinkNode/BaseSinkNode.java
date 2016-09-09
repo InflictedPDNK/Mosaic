@@ -2,8 +2,8 @@ package org.pdnk.canvaprocessor.SinkNode;
 
 import android.util.Log;
 
+import org.pdnk.canvaprocessor.Common.BaseNode;
 import org.pdnk.canvaprocessor.Common.Constants;
-import org.pdnk.canvaprocessor.Common.ParametricRunnable;
 import org.pdnk.canvaprocessor.Data.DataDescriptor;
 import org.pdnk.canvaprocessor.Feedback.CompletedFeedback;
 
@@ -12,12 +12,8 @@ import java.io.IOException;
 /**
  * Created by pnovodon on 9/09/2016.
  */
-abstract class BaseSinkNode<T extends DataDescriptor> implements SinkNode
+abstract class BaseSinkNode<T extends DataDescriptor> extends BaseNode implements SinkNode
 {
-    ParametricRunnable<CompletedFeedback> completedFeedbackListener;
-    Thread procThread;
-    T cachedOutputData;
-
     @Override
     public final void consume(final DataDescriptor data)
     {
@@ -39,8 +35,8 @@ abstract class BaseSinkNode<T extends DataDescriptor> implements SinkNode
                 {
                     try
                     {
-                        if(canCacheOutput())
-                            cachedOutputData = (T) renderData(data).clone();
+                        if(!Thread.currentThread().isInterrupted())
+                            cachedOutputData = renderData(data).clone();
 
                         if (!Thread.currentThread().isInterrupted())
                         {
@@ -57,7 +53,7 @@ abstract class BaseSinkNode<T extends DataDescriptor> implements SinkNode
 
             }
         });
-        procThread.run();
+        procThread.start();
     }
 
     @Override
@@ -66,14 +62,6 @@ abstract class BaseSinkNode<T extends DataDescriptor> implements SinkNode
         //not capable of running
     }
 
-    @Override
-    public final void stop()
-    {
-        if(procThread != null && procThread.isAlive() && !procThread.isInterrupted())
-            procThread.interrupt();
-
-        procThread = null;
-    }
 
     @Override
     public final DataDescriptor readOutput()
@@ -93,23 +81,6 @@ abstract class BaseSinkNode<T extends DataDescriptor> implements SinkNode
         return false;
     }
 
-    @Override
-    public final boolean isInputCacheValid()
-    {
-        return false;
-    }
-
-    @Override
-    public final boolean isOutputCacheValid()
-    {
-        return cachedOutputData != null;
-    }
-
-    @Override
-    public void setCompletedFeedbackListener(ParametricRunnable<CompletedFeedback> completedFeedbackListener)
-    {
-        this.completedFeedbackListener = completedFeedbackListener;
-    }
 
     abstract T renderData(DataDescriptor data) throws IOException;
 }

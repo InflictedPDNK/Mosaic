@@ -2,9 +2,9 @@ package org.pdnk.canvaprocessor.SourceNode;
 
 import android.util.Log;
 
+import org.pdnk.canvaprocessor.Common.BaseNode;
 import org.pdnk.canvaprocessor.Common.Constants;
 import org.pdnk.canvaprocessor.Common.Consumable;
-import org.pdnk.canvaprocessor.Common.ParametricRunnable;
 import org.pdnk.canvaprocessor.Data.DataDescriptor;
 import org.pdnk.canvaprocessor.Feedback.CompletedFeedback;
 
@@ -13,11 +13,9 @@ import java.io.IOException;
 /**
  * Created by pnovodon on 9/09/2016.
  */
-abstract class BaseSourceNode<T extends DataDescriptor> implements SourceNode
+abstract class BaseSourceNode<T extends DataDescriptor> extends BaseNode implements SourceNode
 {
     Consumable consumer;
-    ParametricRunnable<CompletedFeedback> completedFeedbackListener;
-    Thread procThread;
 
     @Override
     public final void run()
@@ -29,37 +27,32 @@ abstract class BaseSourceNode<T extends DataDescriptor> implements SourceNode
             @Override
             public void run()
             {
-                T data;
+                T data = null;
 
                 try
                 {
-                    data = processSourceData();
-
                     if(!Thread.currentThread().isInterrupted())
-                        completedFeedbackListener.run(new CompletedFeedback(true, false, null ));
+                    {
+                        data = processSourceData();
+
+                        completedFeedbackListener.run(new CompletedFeedback(true, false, null));
+                    }
                 } catch (IOException e)
                 {
-                    if(!Thread.currentThread().isInterrupted())
-                        completedFeedbackListener.run(new CompletedFeedback(false, false, e.getMessage()));
+                    completedFeedbackListener.run(new CompletedFeedback(false, false, e.getMessage()));
 
                     return;
                 }
 
-                consumer.consume(data);
+                if(!Thread.currentThread().isInterrupted())
+                    consumer.consume(data);
 
             }
         });
-        procThread.run();
+        procThread.start();
     }
 
-    @Override
-    public final void stop()
-    {
-        if(procThread != null && procThread.isAlive() && !procThread.isInterrupted())
-            procThread.interrupt();
 
-        procThread = null;
-    }
 
     @Override
     public final void addConsumer(Consumable consumableNode)
@@ -85,24 +78,6 @@ abstract class BaseSourceNode<T extends DataDescriptor> implements SourceNode
         return false;
     }
 
-    @Override
-    public final boolean isInputCacheValid()
-    {
-        return false;
-    }
-
-    @Override
-    public final boolean isOutputCacheValid()
-    {
-        return false;
-    }
-
-    @Override
-    public final void setCompletedFeedbackListener(ParametricRunnable<CompletedFeedback> completedFeedbackListener)
-    {
-        this.completedFeedbackListener = completedFeedbackListener;
-
-    }
 
     protected abstract T processSourceData() throws IOException;
 }
