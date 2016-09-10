@@ -2,70 +2,42 @@ package org.pdnk.mosaicproto.application;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
-import org.pdnk.canvaprocessor.Common.ParametricRunnable;
-import org.pdnk.canvaprocessor.Data.DataDescriptor;
-import org.pdnk.canvaprocessor.Feedback.CompletedFeedback;
-import org.pdnk.canvaprocessor.Feedback.ProgressFeedback;
-import org.pdnk.canvaprocessor.Graph.Graph;
-import org.pdnk.canvaprocessor.SinkNode.ByteArraySink;
-import org.pdnk.canvaprocessor.SourceNode.ByteArraySource;
-import org.pdnk.canvaprocessor.TransformPipe.NullTransform;
-import org.pdnk.canvaprocessor.TransformPipe.ReverseTransform;
 import org.pdnk.mosaicproto.R;
+import org.pdnk.mosaicproto.Utility.Utility;
+import org.pdnk.mosaicproto.application.Fragments.BaseGenericFragment;
+import org.pdnk.mosaicproto.application.Fragments.FragmentFactory;
 
 public class MainActivity extends AppCompatActivity
 {
-    Graph g;
+    FragmentFactory fragmentFactory;
+    //Graph g;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Utility.Initialise(this);
 
-        g = new Graph.Builder()
-        .setSourceNode(new ByteArraySource("Test string".getBytes()))
-        .setSinkNode(new ByteArraySink())
-        .addTransformPipe(new ReverseTransform())
-        .addTransformPipe(new NullTransform())
-        .setEnableCacheOutput(true)
-        .setOnCompletionFeedback(new ParametricRunnable<CompletedFeedback>()
-        {
-            boolean once;
-            @Override
-            public void run(CompletedFeedback param)
-            {
-                Log.d("TEST", "Completed: " + param.isSuccessful() + " Error: " + param.getErrorDescription());
+        fragmentFactory = new FragmentFactory(getSupportFragmentManager());
+        fragmentFactory.constructLandingPage();
 
-                if (param.isSuccessful())
-                {
-
-                    DataDescriptor d = g.readGraphOutput();
-                    Log.d("TEST", "OUTPUT: " + new String(d.getData()));
-
-                    if(!once)
-                    {
-                        once = true;
-                        g.pushTransform(new ReverseTransform());
-                        g.runLast();
-                    }
-
-                }
-            }
-        })
-        .setOnProgressFeedback(new ParametricRunnable<ProgressFeedback>()
-        {
-            @Override
-            public void run(ProgressFeedback param)
-            {
-                Log.d("TEST",
-                      "Completion: " + param.getCompletion() + " Elapsed: " + param.getElapsed());
-            }
-        }).buildGraph();
-
-
-        g.run();
     }
+
+    @Override
+    public void onBackPressed()
+    {
+        if(fragmentFactory != null)
+        {
+            BaseGenericFragment topFragment = fragmentFactory.getTopFragment();
+
+            if(topFragment.handleBackButton())
+                return;
+        }
+
+        super.onBackPressed();
+    }
+
+
 }

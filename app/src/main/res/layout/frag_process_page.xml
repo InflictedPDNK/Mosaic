@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"
+                android:clickable="true">
+
+    <LinearLayout
+        android:id="@+id/buttonBlock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/selectImageBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_weight="0.1"
+            android:src="@drawable/ic_folder_open_black_24dp"/>
+
+        <ImageView
+            android:id="@+id/settingsBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_weight="0.1"
+            android:src="@drawable/ic_tune_black_24dp"/>
+
+        <ImageView
+            android:id="@+id/runBtn"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_weight="0.1"
+            android:adjustViewBounds="true"
+            android:src="@drawable/ic_play_arrow_black_24dp"/>
+
+        <ImageView
+            android:id="@+id/shareBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_weight="0.1"
+            android:src="@drawable/ic_share_black_24dp"/>
+    </LinearLayout>
+
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:indeterminate="false"
+        android:max="100"
+        android:layout_alignTop="@id/buttonBlock"
+        android:id="@+id/progress"
+        android:progress="30"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:progressDrawable="@drawable/progress"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="10dp"
+        android:alpha="0.5"
+        android:textColor="@color/colorAccent"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/statusMessage"/>
+    <ImageView
+        android:id="@+id/imageOriginal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:layout_above="@id/buttonBlock"/>
+
+    <SurfaceView
+        android:id="@+id/imageSurface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/buttonBlock"
+        android:visibility="gone"/>
+
+</RelativeLayout>

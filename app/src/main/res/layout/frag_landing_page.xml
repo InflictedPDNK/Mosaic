@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:background="@color/colorPrimary"
+                android:padding="10dp">
+
+
+    <TextView
+        android:id="@+id/welcome1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/welcome_text"
+        android:textColor="@color/colorAccent"
+        android:textSize="28sp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/welcome1"
+        android:layout_marginTop="20dp"
+        android:text="@string/poweredby_text"
+        android:textColor="@color/colorAccent"
+        android:textSize="18sp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"
+        android:text="@string/select_image_link"
+        android:textColor="@color/colorAccent"
+        android:textSize="22sp"
+        android:id="@+id/selectImagelink"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:text="Created by Paul Novodon"
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp"
+        />
+</RelativeLayout>

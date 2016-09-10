@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">MosaicProto</string>
+    <string name="select_image_link">Go on and <u><b>select an image</b></u>…</string>
+    <string name="poweredby_text">powered by CanvaProcessor</string>
+    <string name="welcome_text">Welcome to Mosaic Demo!</string>
+    <string name="confirm_title">Please confirm</string>
+    <string name="no_btn_text">Nope</string>
+    <string name="yes_btn_text">Bring it on</string>
+    <string name="confirm_exit_text">Are you sure you want to quit?</string>
+    <string name="select_image_title">Select image</string>
+    <string name="load_from_disk">Load from disk</string>
+    <string name="pick_from_gallery">Pick from gallery</string>
+    <string name="message_title">Notice</string>
+    <string name="status_cancelled">Cancelled</string>
+    <string name="status_processing">Processing...</string>
+    <string name="status_image_needed">Select image to process</string>
+    <string name="status_ready">Ready</string>
 </resources>
