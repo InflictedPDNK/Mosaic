@@ -3,6 +3,7 @@ package org.pdnk.canvaprocessor.SinkNode;
 import org.pdnk.canvaprocessor.Data.DataDescriptor;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * Created by pnovodon on 9/09/2016.
@@ -15,7 +16,12 @@ public class ByteArraySink extends BaseSinkNode<DataDescriptor>
     DataDescriptor renderData(DataDescriptor data) throws IOException
     {
         DataDescriptor output = new DataDescriptor();
-        output.setData(data.getData().clone());
+        ByteBuffer bb = ByteBuffer.allocate(data.getData().capacity());
+        bb.put(data.getData().array());
+
+        bb.rewind();
+
+        output.setData(bb);
         return output;
     }
 

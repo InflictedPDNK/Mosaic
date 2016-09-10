@@ -36,7 +36,7 @@ abstract class BaseSinkNode<T extends DataDescriptor> extends BaseNode implement
                     try
                     {
                         if(!Thread.currentThread().isInterrupted())
-                            cachedOutputData = renderData(data).clone();
+                            cachedOutputData = renderData((T) data).clone();
 
                         if (!Thread.currentThread().isInterrupted())
                         {
@@ -82,5 +82,5 @@ abstract class BaseSinkNode<T extends DataDescriptor> extends BaseNode implement
     }
 
 
-    abstract T renderData(DataDescriptor data) throws IOException;
+    abstract T renderData(T data) throws IOException;
 }

@@ -19,10 +19,9 @@ import org.pdnk.canvaprocessor.Common.ParametricRunnable;
 import org.pdnk.canvaprocessor.Feedback.CompletedFeedback;
 import org.pdnk.canvaprocessor.Feedback.ProgressFeedback;
 import org.pdnk.canvaprocessor.Graph.Graph;
-import org.pdnk.canvaprocessor.SinkNode.ByteArraySink;
-import org.pdnk.canvaprocessor.SourceNode.ByteArraySource;
+import org.pdnk.canvaprocessor.SinkNode.SimpleSurfaceRenderer;
+import org.pdnk.canvaprocessor.SourceNode.BitmapSource;
 import org.pdnk.canvaprocessor.TransformPipe.NullTransform;
-import org.pdnk.canvaprocessor.TransformPipe.ReverseTransform;
 import org.pdnk.mosaicproto.R;
 import org.pdnk.mosaicproto.Utility.Utility;
 import org.pdnk.mosaicproto.application.Fragments.Data.MessageDlgData;
@@ -199,10 +198,12 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
 
     private void doMosaicFirstTime()
     {
+
+        imageSurface.setVisibility(View.VISIBLE);
+
         graph = new Graph.Builder()
-        .setSourceNode(new ByteArraySource("Test string".getBytes()))
-        .setSinkNode(new ByteArraySink())
-        .addTransformPipe(new ReverseTransform())
+        .setSourceNode(new BitmapSource(bitmapOriginal))
+        .setSinkNode(new SimpleSurfaceRenderer(imageSurface))
         .addTransformPipe(new NullTransform())
         .setEnableCacheOutput(true)
         .setOnCompletionFeedback(new ParametricRunnable<CompletedFeedback>()
@@ -260,6 +261,8 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
                 statusMessage.setText(String.format("Partially completed in %dms", elapsedTime));
             else
                 statusMessage.setText(String.format("Completed in %dms", elapsedTime));
+
+            imageOriginal.setVisibility(View.INVISIBLE);
         }else
         {
             statusMessage.setText(String.format("Failed (%s)",

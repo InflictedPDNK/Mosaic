@@ -3,6 +3,7 @@ package org.pdnk.canvaprocessor.SourceNode;
 import org.pdnk.canvaprocessor.Data.DataDescriptor;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * Created by pnovodon on 9/09/2016.
@@ -18,7 +19,11 @@ public class ByteArraySource extends BaseSourceNode<DataDescriptor>
     protected DataDescriptor processSourceData() throws IOException
     {
         DataDescriptor data = new DataDescriptor();
-        data.setData(inputData);
+        ByteBuffer bb = ByteBuffer.allocate(inputData.length);
+        bb.put(inputData);
+
+        bb.rewind();
+        data.setData(bb);
 
         return data;
     }

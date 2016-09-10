@@ -1,18 +1,20 @@
 package org.pdnk.canvaprocessor.Data;
 
+import java.nio.ByteBuffer;
+
 /**
  * Created by pnovodon on 8/09/2016.
  */
 public class DataDescriptor implements Cloneable
 {
-    protected byte[] data;
+    protected ByteBuffer data;
 
-    public byte[] getData()
+    public ByteBuffer getData()
     {
         return data;
     }
 
-    public void setData(byte[] data)
+    public void setData(ByteBuffer data)
     {
         this.data = data;
     }
