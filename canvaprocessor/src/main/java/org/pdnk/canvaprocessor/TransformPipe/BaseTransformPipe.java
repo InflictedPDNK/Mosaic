@@ -83,7 +83,7 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> extends BaseNo
         }
     }
 
-    private void process(DataDescriptor data)
+    protected void process(DataDescriptor data)
     {
         try
         {

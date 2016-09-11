@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
@@ -16,17 +19,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.pdnk.canvaprocessor.Common.ParametricRunnable;
+import org.pdnk.canvaprocessor.Data.ImageDataDescriptor;
 import org.pdnk.canvaprocessor.Feedback.CompletedFeedback;
 import org.pdnk.canvaprocessor.Feedback.ProgressFeedback;
 import org.pdnk.canvaprocessor.Graph.Graph;
 import org.pdnk.canvaprocessor.SinkNode.SimpleSurfaceRenderer;
 import org.pdnk.canvaprocessor.SourceNode.BitmapSource;
-import org.pdnk.canvaprocessor.TransformPipe.NullTransform;
+import org.pdnk.canvaprocessor.TransformPipe.MosaicNetworkTransform;
 import org.pdnk.mosaicproto.R;
 import org.pdnk.mosaicproto.Utility.Utility;
 import org.pdnk.mosaicproto.application.Fragments.Data.MessageDlgData;
 import org.pdnk.mosaicproto.application.Fragments.Data.ProcessPageData;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -90,6 +97,9 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
 
     private void layoutElements(ViewGroup myView)
     {
+        imageSurface.getHolder().setFormat(PixelFormat.TRANSPARENT);
+        imageSurface.setZOrderOnTop(true);
+
         resetControls();
     }
 
@@ -97,6 +107,42 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
     protected void onSelectImageClick()
     {
         Utility.showImageChooser(this, SELECT_IMAGE_RESULT);
+    }
+
+    @OnClick(R.id.shareBtn)
+    protected void onShareClick()
+    {
+        if(graph != null && graph.readGraphOutput() != null)
+        {
+            ImageDataDescriptor dataDescriptor = (ImageDataDescriptor) graph.readGraphOutput();
+            Bitmap b = Bitmap.createBitmap(dataDescriptor.getWidth(),
+                                           dataDescriptor.getHeight(),
+                                           Bitmap.Config.ARGB_8888);
+
+            dataDescriptor.getData().rewind();
+            b.copyPixelsFromBuffer(dataDescriptor.getData());
+
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("image/jpeg");
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            File f = new File(Environment.getExternalStorageDirectory() + File.separator + "temporary_file.jpg");
+            try
+            {
+                f.createNewFile();
+                FileOutputStream fo = new FileOutputStream(f);
+                fo.write(bytes.toByteArray());
+                fo.close();
+
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file:///" + Environment.getExternalStorageDirectory() + File.separator + "temporary_file.jpg"));
+            startActivity(Intent.createChooser(share, "Share Image"));
+        }
+
+
     }
 
     @OnClick(R.id.runBtn)
@@ -159,9 +205,12 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
 
     }
 
+
     private void processOriginalImage()
     {
         bitmapOriginal = null;
+        imageSurface.setVisibility(View.INVISIBLE);
+        imageOriginal.setVisibility(View.VISIBLE);
         imageOriginal.setImageDrawable(null);
         resetControls();
 
@@ -198,13 +247,14 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
 
     private void doMosaicFirstTime()
     {
-
+        imageOriginal.setVisibility(View.INVISIBLE);
         imageSurface.setVisibility(View.VISIBLE);
+
 
         graph = new Graph.Builder()
         .setSourceNode(new BitmapSource(bitmapOriginal))
-        .setSinkNode(new SimpleSurfaceRenderer(imageSurface))
-        .addTransformPipe(new NullTransform())
+        .setSinkNode(new SimpleSurfaceRenderer(imageSurface, 32, 32))
+        .addTransformPipe(new MosaicNetworkTransform(getContext(), 32, 32, "192.168.0.10:8765"))
         .setEnableCacheOutput(true)
         .setOnCompletionFeedback(new ParametricRunnable<CompletedFeedback>()
         {
@@ -262,9 +312,10 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
             else
                 statusMessage.setText(String.format("Completed in %dms", elapsedTime));
 
-            imageOriginal.setVisibility(View.INVISIBLE);
+
         }else
         {
+            imageOriginal.setVisibility(View.VISIBLE);
             statusMessage.setText(String.format("Failed (%s)",
                                                 completedFeedback.getErrorDescription()));
         }
@@ -288,7 +339,7 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
     private void resetControls()
     {
         enableButton(selectImageBtn, true);
-        enableButton(shareBtn, graph != null && graph.readGraphOutput() != null);
+        enableButton(shareBtn, graph != null);
         enableButton(runBtn, true);
         enableButton(settingsBtn, true);
 

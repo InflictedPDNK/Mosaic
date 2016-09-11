@@ -68,6 +68,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
+        android:scaleType="center"
         android:layout_above="@id/buttonBlock"/>
 
     <SurfaceView
@@ -75,6 +76,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/buttonBlock"
-        android:visibility="gone"/>
+        android:visibility="invisible"/>
 
 </RelativeLayout>

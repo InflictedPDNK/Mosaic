@@ -18,7 +18,6 @@ class GraphDescriptor
     SinkNode sink;
     LinkedList<TransformPipe> transforms;
     boolean outputCacheEnabled = false;
-    boolean enableImmutableGraph = false;
     boolean enablePartialCompletion = false;
     ParametricRunnable<ProgressFeedback> progressFeedbackListener;
     ParametricRunnable<CompletedFeedback> completionFeedbackListener;

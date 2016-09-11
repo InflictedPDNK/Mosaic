@@ -47,7 +47,6 @@ public class Graph
 
     public void pushTransform(@NonNull TransformPipe pipe) throws IllegalStateException
     {
-        failIfImmutable();
         failIfRunning();
 
         if(descriptor.transforms == null)
@@ -69,7 +68,6 @@ public class Graph
 
     public TransformPipe popTransform() throws IllegalStateException
     {
-        failIfImmutable();
         failIfRunning();
 
         if(descriptor.transforms == null || descriptor.transforms.isEmpty())
@@ -313,12 +311,6 @@ public class Graph
             throw new IllegalStateException("Can't modify graph while running");
     }
 
-    private void failIfImmutable() throws IllegalStateException
-    {
-        if(descriptor.enableImmutableGraph)
-            throw new IllegalStateException("Can't modify graph after its creating. Use enableImmutableGraph in order to permit");
-    }
-
     public static class Builder
     {
         GraphDescriptor descriptor;
@@ -352,12 +344,6 @@ public class Graph
         public Builder setEnableCacheOutput(boolean outputCacheEnabled)
         {
             descriptor.outputCacheEnabled = outputCacheEnabled;
-            return this;
-        }
-
-        public Builder setEnableImmutable(boolean enableImmutableGraph)
-        {
-            descriptor.enableImmutableGraph = enableImmutableGraph;
             return this;
         }
 
