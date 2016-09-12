@@ -3,6 +3,8 @@ package org.pdnk.canvaprocessor.Common;
 import org.pdnk.canvaprocessor.Data.DataDescriptor;
 import org.pdnk.canvaprocessor.Feedback.CompletedFeedback;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Created by pnovodon on 9/09/2016.
  */
@@ -12,12 +14,16 @@ public abstract class BaseNode implements Node
     protected Thread procThread;
     protected DataDescriptor cachedOutputData;
     protected DataDescriptor cachedInputData;
+    protected boolean enablePartialCompletion;
+    protected AtomicBoolean running = new AtomicBoolean(false);
 
     @Override
     public final void stop()
     {
         if(procThread != null && procThread.isAlive() && !procThread.isInterrupted())
             procThread.interrupt();
+
+        running.set(false);
 
         procThread = null;
     }
@@ -38,5 +44,23 @@ public abstract class BaseNode implements Node
     public final boolean isOutputCacheValid()
     {
         return cachedOutputData != null;
+    }
+
+    @Override
+    public void setEnablePartial(boolean enablePartial)
+    {
+        enablePartialCompletion = enablePartial;
+    }
+
+    @Override
+    public AtomicBoolean isRunning()
+    {
+        return running;
+    }
+
+    @Override
+    public boolean isPartialCompletionEnabled()
+    {
+        return enablePartialCompletion;
     }
 }

@@ -7,8 +7,7 @@ public class ImageDataDescriptor extends DataDescriptor
 {
     private int height;
     private int width;
-    private int strideWidth;
-    private int strideHeight;
+
 
     public int getHeight()
     {
@@ -30,23 +29,5 @@ public class ImageDataDescriptor extends DataDescriptor
         this.width = width;
     }
 
-    public int getStrideWidth()
-    {
-        return strideWidth;
-    }
 
-    public void setStrideWidth(int strideWidth)
-    {
-        this.strideWidth = strideWidth;
-    }
-
-    public int getStrideHeight()
-    {
-        return strideHeight;
-    }
-
-    public void setStrideHeight(int strideHeight)
-    {
-        this.strideHeight = strideHeight;
-    }
 }

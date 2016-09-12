@@ -10,7 +10,7 @@ import java.io.IOException;
 public class ReverseTransform extends BaseTransformPipe<DataDescriptor>
 {
     @Override
-    DataDescriptor transformData(DataDescriptor data) throws IOException
+    protected DataDescriptor transformData(DataDescriptor data) throws IOException
     {
         byte[] in = data.getData().array();
         int endIndex = in.length - 1;

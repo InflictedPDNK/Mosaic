@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 /**
  * Created by pnovodon on 9/09/2016.
  */
-public class ByteArraySink extends BaseSinkNode<DataDescriptor>
+public class NullCachingSink extends BaseSinkNode<DataDescriptor>
 {
 
 

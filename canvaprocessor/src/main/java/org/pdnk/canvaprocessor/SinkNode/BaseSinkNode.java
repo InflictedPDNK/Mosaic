@@ -19,47 +19,40 @@ abstract class BaseSinkNode<T extends DataDescriptor> extends BaseNode implement
     {
         Log.d(Constants.MAIN_TAG, "\tRendering data by " + getClass().getSimpleName());
 
-        procThread = new Thread(new Runnable()
+        if(data == null)
         {
-            @Override
-            public void run()
+            completedFeedbackListener.run(new CompletedFeedback(false,
+                                                                false,
+                                                                "No data to consume"));
+        }
+        else
+        {
+            running.set(true);
+
+            try
             {
+                if(!Thread.currentThread().isInterrupted())
+                    cachedOutputData = renderData((T) data).clone();
 
-                if(data == null)
+                if (!Thread.currentThread().isInterrupted())
                 {
-                    completedFeedbackListener.run(new CompletedFeedback(false,
-                                                                        false,
-                                                                        "No data to consume"));
+                    completedFeedbackListener.run(new CompletedFeedback(true, false, null));
                 }
-                else
-                {
-                    try
-                    {
-                        if(!Thread.currentThread().isInterrupted())
-                            cachedOutputData = renderData((T) data).clone();
-
-                        if (!Thread.currentThread().isInterrupted())
-                        {
-                            completedFeedbackListener.run(new CompletedFeedback(true, false, null));
-                        }
-                    } catch (IOException e)
-                    {
-                        if (!Thread.currentThread().isInterrupted())
-                            completedFeedbackListener.run(new CompletedFeedback(false, false, e.getMessage()));
-
-                    }
-                }
-
+            } catch (IOException e)
+            {
+                if (!Thread.currentThread().isInterrupted())
+                    completedFeedbackListener.run(new CompletedFeedback(false, false, e.getMessage()));
 
             }
-        });
-        procThread.start();
+        }
+
+        running.set(false);
     }
 
     @Override
     public final void run()
     {
-        //not capable of running
+        //not capable of running itself
     }
 
 

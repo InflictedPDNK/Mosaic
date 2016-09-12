@@ -1,9 +1,10 @@
-package org.pdnk.canvaprocessor.TransformPipe;
+package org.pdnk.canvaprocessor.TransformPipe.MosaicTransform;
 
 import android.graphics.Color;
 import android.support.v4.graphics.ColorUtils;
 
 import org.pdnk.canvaprocessor.Data.ImageDataDescriptor;
+import org.pdnk.canvaprocessor.TransformPipe.BaseTransformPipe;
 
 import java.io.IOException;
 
@@ -22,7 +23,7 @@ public class MosaicSimpleTransform extends BaseTransformPipe<ImageDataDescriptor
     }
 
     @Override
-    ImageDataDescriptor transformData(ImageDataDescriptor data) throws IOException
+    protected ImageDataDescriptor transformData(ImageDataDescriptor data) throws IOException
     {
         return mosaicRGB(data);
     }

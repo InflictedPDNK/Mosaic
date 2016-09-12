@@ -24,31 +24,24 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> extends BaseNo
     {
         Log.d(Constants.MAIN_TAG, "\tTransforming data by " + getClass().getSimpleName());
 
-        procThread = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                if(data == null)
-                {
-                    completedFeedbackListener.run(new CompletedFeedback(false,
-                                                                        false,
-                                                                        "No data to consume"));
-                }else
-                {
-                    if(!Thread.currentThread().isInterrupted())
-                    {
-                        if (canCacheInput())
-                        {
-                            cachedInputData = data.clone();
-                        }
-                    }
 
-                    process(data);
+        if(data == null)
+        {
+            completedFeedbackListener.run(new CompletedFeedback(false,
+                                                                false,
+                                                                "No data to consume"));
+        }else
+        {
+            if(!Thread.currentThread().isInterrupted())
+            {
+                if (canCacheInput())
+                {
+                    cachedInputData = data.clone();
                 }
+
+                process(data);
             }
-        });
-        procThread.start();
+        }
     }
 
 
@@ -93,15 +86,23 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> extends BaseNo
             T dataToSend = null;
 
             if(!Thread.currentThread().isInterrupted())
+            {
+                running.set(true);
+
                 dataToSend = transformData((T) data);
 
-            if (canCacheOutput() && !Thread.currentThread().isInterrupted())
+                running.set(false);
+            }
+
+            if (canCacheOutput())
             {
                 cachedOutputData = dataToSend.clone();
             }
 
             if (!Thread.currentThread().isInterrupted())
+            {
                 consumer.consume(dataToSend);
+            }
 
             if (!Thread.currentThread().isInterrupted())
             {
@@ -110,8 +111,12 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> extends BaseNo
         } catch (IOException | ClassCastException e)
         {
             if (!Thread.currentThread().isInterrupted())
+            {
                 completedFeedbackListener.run(new CompletedFeedback(false,
-                                                                    partiallyCompleted, e.getMessage()));
+                                                                    partiallyCompleted,
+                                                                    e.getMessage()));
+                running.set(false);
+            }
 
         }
     }
@@ -140,12 +145,12 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> extends BaseNo
         consumer = consumableNode;
     }
 
-    protected void setPartiallyCompleted()
+    public void setPartiallyCompleted()
     {
         partiallyCompleted = true;
     }
 
-    abstract T transformData(T data) throws IOException;
+    protected abstract T transformData(T data) throws IOException;
 
 
 }

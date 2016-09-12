@@ -22,6 +22,8 @@ abstract class BaseSourceNode<T extends DataDescriptor> extends BaseNode impleme
     {
         Log.d(Constants.MAIN_TAG, "\tProducing data by " + getClass().getSimpleName());
 
+        running.set(true);
+
         procThread = new Thread(new Runnable()
         {
             @Override
@@ -36,16 +38,19 @@ abstract class BaseSourceNode<T extends DataDescriptor> extends BaseNode impleme
                         data = processSourceData();
 
                         completedFeedbackListener.run(new CompletedFeedback(true, false, null));
+
+                        running.set(false);
                     }
+
+                    if(!Thread.currentThread().isInterrupted())
+                        consumer.consume(data);
                 } catch (IOException e)
                 {
                     completedFeedbackListener.run(new CompletedFeedback(false, false, e.getMessage()));
-
-                    return;
+                    running.set(false);
                 }
 
-                if(!Thread.currentThread().isInterrupted())
-                    consumer.consume(data);
+
 
             }
         });

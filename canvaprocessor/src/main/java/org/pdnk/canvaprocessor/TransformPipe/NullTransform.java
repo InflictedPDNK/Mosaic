@@ -10,7 +10,7 @@ import java.io.IOException;
 public class NullTransform extends BaseTransformPipe<DataDescriptor>
 {
     @Override
-    DataDescriptor transformData(DataDescriptor data) throws IOException
+    protected DataDescriptor transformData(DataDescriptor data) throws IOException
     {
         //simple pass-thru
         return data;

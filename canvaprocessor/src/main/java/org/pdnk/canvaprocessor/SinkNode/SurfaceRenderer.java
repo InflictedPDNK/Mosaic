@@ -15,14 +15,14 @@ import java.io.IOException;
 /**
  * Created by pnovodon on 10/09/2016.
  */
-public class SimpleSurfaceRenderer extends BaseSinkNode<ImageDataDescriptor>
+public class SurfaceRenderer extends BaseSinkNode<ImageDataDescriptor>
 {
     SurfaceView surfaceView;
     private final int effectWidth;
     private final int effectHeight;
     Bitmap renderBitmap;
     boolean firstRender;
-    public SimpleSurfaceRenderer(@NonNull SurfaceView targetSurface, int effectWidth, int effectHeight)
+    public SurfaceRenderer(@NonNull SurfaceView targetSurface, int effectWidth, int effectHeight)
     {
         this.surfaceView = targetSurface;
         this.effectWidth = effectWidth;
@@ -42,26 +42,26 @@ public class SimpleSurfaceRenderer extends BaseSinkNode<ImageDataDescriptor>
     @Override
     public void prepare()
     {
-        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback()
+        cachedOutputData = null;
+        renderBitmap = null;
+
+        surfaceView.getHolder().removeCallback(surfaceCallback);
+        surfaceView.getHolder().addCallback(surfaceCallback);
+
+        clearSurface(surfaceView.getHolder());
+    }
+
+    private void clearSurface(SurfaceHolder holder)
+    {
+        if(holder.getSurface() == null)
+            return;
+
+        Canvas canvas = holder.lockCanvas();
+        if(canvas != null)
         {
-            @Override
-            public void surfaceCreated(SurfaceHolder holder)
-            {
-                updateSurface(holder, (ImageDataDescriptor) cachedOutputData);
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
-            {
-                updateSurface(holder, (ImageDataDescriptor) cachedOutputData);
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder)
-            {
-
-            }
-        });
+            canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+            holder.unlockCanvasAndPost(canvas);
+        }
     }
 
     private void updateSurface(SurfaceHolder holder, ImageDataDescriptor data)
@@ -125,4 +125,31 @@ public class SimpleSurfaceRenderer extends BaseSinkNode<ImageDataDescriptor>
             }
         }
     }
+
+    SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback()
+    {
+        @Override
+        public void surfaceCreated(SurfaceHolder holder)
+        {
+            if(cachedOutputData != null)
+                updateSurface(holder, (ImageDataDescriptor) cachedOutputData);
+            else
+                clearSurface(holder);
+        }
+
+        @Override
+        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
+        {
+            if(cachedOutputData != null)
+                updateSurface(holder, (ImageDataDescriptor) cachedOutputData);
+            else
+                clearSurface(holder);
+        }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder holder)
+        {
+
+        }
+    };
 }

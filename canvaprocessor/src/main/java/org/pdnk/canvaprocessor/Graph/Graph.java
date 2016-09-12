@@ -213,7 +213,10 @@ public class Graph
     private void prepareNodes()
     {
         for(Node node : path)
+        {
+            node.setEnablePartial(descriptor.enablePartialCompletion);
             node.prepare();
+        }
     }
 
     private void connectNodes()
@@ -254,6 +257,9 @@ public class Graph
         {
             synchronized (reportingLock)
             {
+                if(myState == State.IDLE)
+                    return;
+
                 if(!param.isSuccessful() || (param.isPartial() && !descriptor.enablePartialCompletion))
                 {
                     myState = State.IDLE;
@@ -289,6 +295,7 @@ public class Graph
     {
         for(Node node : path)
         {
+            myState = State.IDLE;
             node.stop();
         }
     }

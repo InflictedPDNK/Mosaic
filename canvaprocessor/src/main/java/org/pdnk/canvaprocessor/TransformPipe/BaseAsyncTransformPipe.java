@@ -8,10 +8,10 @@ import java.io.IOException;
 /**
  * Created by pnovodon on 11/09/2016.
  */
-abstract class BaseAsyncTransformPipe<T extends DataDescriptor> extends BaseTransformPipe<T>
+public abstract class BaseAsyncTransformPipe<T extends DataDescriptor> extends BaseTransformPipe<T>
 {
     @Override
-    final T transformData(T data) throws IOException
+    protected final T transformData(T data) throws IOException
     {
         return null;
     }
@@ -22,11 +22,15 @@ abstract class BaseAsyncTransformPipe<T extends DataDescriptor> extends BaseTran
     {
         partiallyCompleted = false;
         if(!Thread.currentThread().isInterrupted())
+        {
+            running.set(true);
             startTransformData((T) data);
+        }
     }
 
-    protected void endTransformData(T data)
+    public void endTransformData(T data)
     {
+        running.set(false);
         try
         {
             if(data == null || data.getData() == null)
@@ -61,5 +65,5 @@ abstract class BaseAsyncTransformPipe<T extends DataDescriptor> extends BaseTran
         }
     }
 
-    abstract void startTransformData(T data);
+    protected abstract void startTransformData(T data);
 }

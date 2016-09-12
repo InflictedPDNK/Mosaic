@@ -24,9 +24,9 @@ import org.pdnk.canvaprocessor.Data.ImageDataDescriptor;
 import org.pdnk.canvaprocessor.Feedback.CompletedFeedback;
 import org.pdnk.canvaprocessor.Feedback.ProgressFeedback;
 import org.pdnk.canvaprocessor.Graph.Graph;
-import org.pdnk.canvaprocessor.SinkNode.SimpleSurfaceRenderer;
+import org.pdnk.canvaprocessor.SinkNode.SurfaceRenderer;
 import org.pdnk.canvaprocessor.SourceNode.BitmapSource;
-import org.pdnk.canvaprocessor.TransformPipe.MosaicNetworkTransform;
+import org.pdnk.canvaprocessor.TransformPipe.MosaicTransform.MosaicNetworkTransform;
 import org.pdnk.canvaprocessor.TransformPipe.TransformPipe;
 import org.pdnk.mosaicproto.R;
 import org.pdnk.mosaicproto.Utility.Utility;
@@ -94,17 +94,7 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
                                                         false);
         ButterKnife.bind(this, myView);
 
-        layoutElements(myView);
-
-        return myView;
-    }
-
-    private void layoutElements(ViewGroup myView)
-    {
-        imageSurface.getHolder().setFormat(PixelFormat.TRANSPARENT);
-        imageSurface.setZOrderOnTop(true);
-
-        resetControls();
+        layoutElements();
 
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.shared_pref_loc), 0);
         if(sharedPreferences.getBoolean(getString(R.string.set_first_launch), true))
@@ -117,6 +107,16 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
 
             fragmentFactory.constructMessageDialog(new MessageDlgData("Please set the API endpoint IP"));
         }
+
+        return myView;
+    }
+
+    private void layoutElements()
+    {
+        imageSurface.getHolder().setFormat(PixelFormat.TRANSPARENT);
+        imageSurface.setZOrderOnTop(true);
+
+        resetControls();
     }
 
     @OnClick(R.id.selectImageBtn)
@@ -185,6 +185,9 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
             }
         }else
         {
+            imageOriginal.setVisibility(View.INVISIBLE);
+            imageSurface.setVisibility(View.VISIBLE);
+
             runBtn.setImageResource(R.drawable.ic_close_black_24dp);
             enableButton(selectImageBtn, false);
             enableButton(shareBtn, false);
@@ -274,15 +277,12 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
 
     private void doMosaicFirstTime()
     {
-        imageOriginal.setVisibility(View.INVISIBLE);
-        imageSurface.setVisibility(View.VISIBLE);
-
 
         SettingsData settings = SettingsData.readCurrentSettings(getActivity());
 
         graph = new Graph.Builder()
         .setSourceNode(new BitmapSource(bitmapOriginal))
-        .setSinkNode(new SimpleSurfaceRenderer(imageSurface, settings.tileSize, settings.tileSize))
+        .setSinkNode(new SurfaceRenderer(imageSurface, settings.tileSize, settings.tileSize))
         .addTransformPipe(new MosaicNetworkTransform(getContext(), settings.tileSize, settings.tileSize, settings.apiEndpoint))
         .setEnableCacheOutput(true)
         .setOnCompletionFeedback(new ParametricRunnable<CompletedFeedback>()
@@ -352,6 +352,7 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
         }else
         {
             imageOriginal.setVisibility(View.VISIBLE);
+            imageSurface.setVisibility(View.INVISIBLE);
             statusMessage.setText(String.format("Failed (%s)",
                                                 completedFeedback.getErrorDescription()));
         }
