@@ -3,6 +3,7 @@ package org.pdnk.canvaprocessor.TransformPipe.MosaicTransform;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -175,9 +176,17 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
     @Override
     public void prepare()
     {
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).threadPoolSize(15).build();
-        ImageLoader.getInstance().init(config);
+        DisplayImageOptions options =
+                new DisplayImageOptions.Builder()
+                        .cacheInMemory(true)
+                        .cacheOnDisk(false)
+                        .build();
 
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
+                .threadPoolSize(15)
+                .defaultDisplayImageOptions(options)
+                .build();
+        ImageLoader.getInstance().init(config);
         downloadRequestCounter = new AtomicInteger(0);
         cachedBitmaps = new HashMap<>();
 
