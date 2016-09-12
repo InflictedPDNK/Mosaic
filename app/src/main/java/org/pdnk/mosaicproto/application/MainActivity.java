@@ -10,7 +10,7 @@ import org.pdnk.mosaicproto.application.Fragments.FragmentFactory;
 
 public class MainActivity extends AppCompatActivity
 {
-    FragmentFactory fragmentFactory;
+    private FragmentFactory fragmentFactory;
     //Graph g;
     @Override
     protected void onCreate(Bundle savedInstanceState)

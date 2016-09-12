@@ -51,9 +51,9 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
 {
     private final int SELECT_IMAGE_RESULT = 1;
 
-    FragmentFactory fragmentFactory;
-    Bitmap bitmapOriginal;
-    boolean processing;
+    private FragmentFactory fragmentFactory;
+    private Bitmap bitmapOriginal;
+    private boolean processing;
 
     @BindView(R.id.imageSurface)
     SurfaceView imageSurface;
@@ -332,7 +332,7 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
         graph.run();
     }
 
-    void doMosaicRepeat()
+    private void doMosaicRepeat()
     {
         TransformPipe transform = graph.peekTransform();
         if(transform instanceof MosaicNetworkTransform)
@@ -344,7 +344,7 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
         graph.runLast();
     }
 
-    void onMosaicCompleted(CompletedFeedback completedFeedback)
+    private void onMosaicCompleted(CompletedFeedback completedFeedback)
     {
         spinner.setVisibility(View.GONE);
 
@@ -368,7 +368,7 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
         processing = false;
     }
 
-    void onMosaicUpdate(ProgressFeedback progressFeedback)
+    private void onMosaicUpdate(ProgressFeedback progressFeedback)
     {
         if(progressFeedback.getCompletion() == 1.f)
         {

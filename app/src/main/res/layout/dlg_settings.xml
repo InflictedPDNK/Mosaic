@@ -54,7 +54,7 @@
         android:layout_below="@id/tileSizeLabel"
         android:layout_marginBottom="10dp"
         android:labelFor="@+id/apiEndpointEdit"
-        android:text="@string/api_enpoint_label"
+        android:text="@string/api_endpoint_label"
         android:textColor="@color/colorAccent"
         android:textSize="14sp"/>
 

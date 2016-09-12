@@ -9,5 +9,5 @@ public class MessageDlgData extends FragmentData
     {
         this.message = message;
     }
-    public String message;
+    public final String message;
 }
