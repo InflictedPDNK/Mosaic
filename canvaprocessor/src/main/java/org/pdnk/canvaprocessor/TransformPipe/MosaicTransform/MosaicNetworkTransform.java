@@ -18,6 +18,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by pnovodon on 11/09/2016.
  */
+
+/**
+ * Mosaic image transform with mosaic tiles loaded from network.<br/>
+ * Uses standard RGB averaging.<br/>
+ * Algorithms are not optimised for large images and serve only as a demo.
+ */
 public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDescriptor>
 {
     private final Context context;
@@ -36,6 +42,12 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
     ImageDataDescriptor inputData;
 
 
+    /**
+     * @param  context context of the caller (required for networking)
+     * @param tileWidth mosaic tile width
+     * @param tileHeight mosaic tile height
+     * @param apiEndpointIP IP of the api endpoint in form of "http://x.x.x.x" (no port is needed)
+     */
     public MosaicNetworkTransform(Context context,
                                   int tileWidth,
                                   int tileHeight,
@@ -53,11 +65,21 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
         analyseImage(data);
     }
 
+
     private void analyseImage(ImageDataDescriptor data)
     {
+        Tile tile;
+        int stride = data.getWidth() * 4;
+        int scanline = 0, currentScanline = 0;
+        byte[] input = data.getData().array();
+        int avgIndex;
+
+        downloadRequestCounter.set(0);
         analysing.set(true);
+
         inputData = data;
 
+        //find out the dimensions of new mosaic
         mosaicMatrixWidth = data.getWidth() / tileWidth;
         if (data.getWidth() % tileWidth != 0)
             ++mosaicMatrixWidth;
@@ -65,19 +87,13 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
         if (data.getHeight() % tileHeight != 0)
             ++mosaicMatrixHeight;
 
-        int stride = data.getWidth() * 4;
 
         tileColors = new int[mosaicMatrixWidth * mosaicMatrixHeight];
         Tile[] tileRow = new Tile[mosaicMatrixWidth];
 
-        byte[] input = data.getData().array();
-        int avgIndex;
-
-        Tile tile;
-        int scanline = 0, currentScanline = 0;
-
-        downloadRequestCounter.set(0);
-
+        //scan the image by scanlines. scanline equals to one physical row of mosaic
+        //once a row is scanned, each mosaic tile is analysed for average color, mapped to a reference
+        //color table and network requests are issued, if necessary
         for (int i = 0; i < input.length - 4 && running.get(); i += 4)
         {
             scanline = i / stride / tileHeight;
@@ -97,14 +113,20 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
                 tileRow[avgIndex] = tile;
             }
 
+            //simple RGB average
             tile.r += input[i] & 0xff;
             tile.g += input[i + 1] & 0xff;
             tile.b += input[i + 2] & 0xff;
+
+            //count number of original pixels in a tile (required for proper clipping analysis)
             ++tile.tilePixelCount;
         }
 
+        //last row mapping
         mapAverageColors(tileRow, scanline * mosaicMatrixWidth);
 
+        //if downloads are finished, build mosaic immediately. otherwise wait for downloader to
+        //build it
         if (downloadRequestCounter.get() == 0 && running.get())
             buildMosaic();
 
@@ -116,6 +138,7 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
         int avgColor;
         for (int j = 0; j < mosaicMatrixWidth && running.get(); ++j)
         {
+            //calculate average color
             avgColor = (tileRow[j].r / tileRow[j].tilePixelCount) << 16 |
                     (tileRow[j].g / tileRow[j].tilePixelCount) << 8 |
                     (tileRow[j].b / tileRow[j].tilePixelCount);
@@ -123,6 +146,7 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
             tileColors[tileColorsStride + j] = avgColor;
             Integer color = avgColor;
 
+            //request image load if cached tile bitmaps is missing
             if (!cachedBitmaps.containsKey(color))
             {
                 cachedBitmaps.put(color, null);
@@ -141,6 +165,9 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
     void buildMosaic()
     {
         int x;
+
+        //iterate throw mosaic tile and draw corresponding cached bitmaps into the respective tiles
+        //of original image. indexing is combined for optimal performance
         for (int i = 0; i < mosaicMatrixWidth * mosaicMatrixHeight && running.get(); ++i)
         {
             int tileColor = tileColors[i];
@@ -164,8 +191,6 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
                         inputData.getData().array()[idx + 3] = b.array()[j + 3];
                     }
                 }
-
-
             }
         }
 
@@ -194,12 +219,20 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
 
     }
 
+    /**
+     * @param width mosaic tile width
+     * @param height mosaic tile height
+     */
     public void setTileSize(int width, int height)
     {
         tileWidth = width;
         tileHeight = height;
     }
 
+    /**
+     *
+     * @param APIendpoint IP of the api endpoint in form of "http://x.x.x.x" (no port is needed)
+     */
     public void setAPIendpoint(@NonNull String APIendpoint)
     {
         this.apiEndpointIP = APIendpoint;

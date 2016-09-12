@@ -15,6 +15,12 @@ import java.io.IOException;
 /**
  * Created by pnovodon on 10/09/2016.
  */
+
+/**
+ * Sink node for rendering image into a SurfaceView. Uses scanline animation for the first render.
+ * Maintains surface update after render has been completed.</br>
+ * Scales incoming image to fit into the surface preserving original aspect ratio of the image.
+ */
 public class SurfaceRenderer extends BaseSinkNode<ImageDataDescriptor>
 {
     SurfaceView surfaceView;
@@ -77,8 +83,6 @@ public class SurfaceRenderer extends BaseSinkNode<ImageDataDescriptor>
             data.getData().rewind();
         }
 
-        double ar = (double)renderBitmap.getHeight()/ (double)renderBitmap.getWidth();
-
         if(firstRender)
         {
             int mosaicMatrixHeight = data.getHeight()/effectHeight;
@@ -100,39 +104,31 @@ public class SurfaceRenderer extends BaseSinkNode<ImageDataDescriptor>
                 if (canvas == null)
                     return;
 
+                //define scaling rectangle preserving aspect ratio
                 if(srcR == null)
                 {
-                    int targetWidth = canvas.getWidth();
-                    int targetHeight = (int) (targetWidth * ar);
-                    int y = 0;
-                    int x = 0;
+                    dstR = getScaledRect(canvas);
 
-                    if(targetHeight <= canvas.getHeight())
-                    {
-                        y = (canvas.getHeight() - targetHeight) / 2;
-                    }else
-                    {
-                        targetHeight = canvas.getHeight();
-                        targetWidth = (int) (targetHeight/ ar);
-                        x = (canvas.getWidth() - targetWidth) / 2;
-                    }
-
-                    heightRatio = (double)targetHeight / (double) renderBitmap.getHeight();
+                    heightRatio = (double)dstR.height() / (double) renderBitmap.getHeight();
                     srcR = new Rect(0, 0, data.getWidth(), effectHeight);
-                    dstR = new Rect(x, y, x + targetWidth, (int) (y + effectHeight * heightRatio));
+                    dstR.bottom = (int) (dstR.top + effectHeight * heightRatio);
                 }
+
+                //clear canvas
                 canvas.drawColor(0, PorterDuff.Mode.CLEAR);
 
-
+                //draw
                 canvas.drawBitmap(renderBitmap, srcR, dstR, null);
 
                 holder.unlockCanvasAndPost(canvas);
 
+                //step to next mosaic scanling
                 srcR.bottom += effectHeight;
                 dstR.bottom += effectHeight * heightRatio;
 
                 try
                 {
+                    //16 ms is attempt to achieve 60 ms, although not guaranteed :)
                     Thread.sleep(16);
                 } catch (InterruptedException e)
                 {
@@ -143,27 +139,33 @@ public class SurfaceRenderer extends BaseSinkNode<ImageDataDescriptor>
             firstRender = false;
         }else
         {
+            //if it is a subsequent render, simply draw bitmap without animation
             Canvas canvas = holder.lockCanvas();
             if (canvas != null)
             {
-                int targetWidth = canvas.getWidth();
-                int targetHeight = (int) (targetWidth * ar);
-                int y = 0, x = 0;
-                if(targetHeight < canvas.getHeight())
-                {
-                    y = (canvas.getHeight() - targetHeight) / 2;
-                }else
-                {
-                    targetHeight = canvas.getHeight();
-                    targetWidth = (int) (targetHeight/ ar);
-                    x = (canvas.getWidth() - targetWidth) / 2;
-                }
-
-                Rect dstRect = new Rect(x, y, targetWidth + x, targetHeight + y);
-                canvas.drawBitmap(renderBitmap, null, dstRect, null);
+                canvas.drawBitmap(renderBitmap, null, getScaledRect(canvas), null);
                 holder.unlockCanvasAndPost(canvas);
             }
         }
+    }
+
+    private Rect getScaledRect(Canvas canvas)
+    {
+        double ar = (double)renderBitmap.getHeight()/ (double)renderBitmap.getWidth();
+        int targetWidth = canvas.getWidth();
+        int targetHeight = (int) (targetWidth * ar);
+        int y = 0, x = 0;
+        if(targetHeight < canvas.getHeight())
+        {
+            y = (canvas.getHeight() - targetHeight) / 2;
+        }else
+        {
+            targetHeight = canvas.getHeight();
+            targetWidth = (int) (targetHeight/ ar);
+            x = (canvas.getWidth() - targetWidth) / 2;
+        }
+
+        return new Rect(x, y, targetWidth + x, targetHeight + y);
     }
 
     SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback()

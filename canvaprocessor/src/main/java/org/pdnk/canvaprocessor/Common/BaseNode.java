@@ -8,6 +8,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by pnovodon on 9/09/2016.
  */
+
+/**
+ * Base implementation of the node.
+ * Handles run/stop states and maintains caching.
+ */
 public abstract class BaseNode implements Node
 {
     protected ParametricRunnable<CompletedFeedback> completedFeedbackListener;
@@ -20,9 +25,11 @@ public abstract class BaseNode implements Node
     @Override
     public final void stop()
     {
+        //interrupt processing thread if it exists
         if(procThread != null && procThread.isAlive() && !procThread.isInterrupted())
             procThread.interrupt();
 
+        //clear running flag
         running.set(false);
 
         procThread = null;

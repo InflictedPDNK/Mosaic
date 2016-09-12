@@ -12,10 +12,19 @@ import java.io.IOException;
 /**
  * Created by pnovodon on 9/09/2016.
  */
+
+/**
+ * Base implementation of Sink node.<br/>
+ * This implementation always caches output and never caches input data, hence graph can rely
+ * on the result cache.<br/>
+ * Data is consumed on the thread of the producing node, however the whole process can be overridden
+ * for required asynchronicity
+ * @param <T> type of {@link DataDescriptor}
+ */
 abstract class BaseSinkNode<T extends DataDescriptor> extends BaseNode implements SinkNode
 {
     @Override
-    public final void consume(final DataDescriptor data)
+    public void consume(final DataDescriptor data)
     {
         Log.d(Constants.MAIN_TAG, "\tRendering data by " + getClass().getSimpleName());
 

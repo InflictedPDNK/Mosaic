@@ -11,11 +11,22 @@ import java.io.IOException;
 /**
  * Created by pnovodon on 11/09/2016.
  */
+
+/**
+ * Simple version of mosaic without Network capabilities. Creates a pixelated picture.<br/>
+ * Current algorithms are not optimised for large images and serve as a demo goal only.<br/>
+ * Supports RGB and LAB version.
+ */
 public class MosaicSimpleTransform extends BaseTransformPipe<ImageDataDescriptor>
 {
     private final int tileWidth;
     private final int tileHeight;
 
+    /**
+     *
+     * @param tileWidth mosaic tile width
+     * @param tileHeight mosaic tile height
+     */
     public MosaicSimpleTransform(int tileWidth, int tileHeight)
     {
         this.tileWidth = tileWidth;

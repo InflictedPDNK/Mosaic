@@ -8,6 +8,10 @@ import java.nio.ByteBuffer;
 /**
  * Created by pnovodon on 9/09/2016.
  */
+
+/**
+ * Simple raw byte array source which clones the external data to prevent its in-place modification.
+ */
 public class ByteArraySource extends BaseSourceNode<DataDescriptor>
 {
     byte[] inputData;

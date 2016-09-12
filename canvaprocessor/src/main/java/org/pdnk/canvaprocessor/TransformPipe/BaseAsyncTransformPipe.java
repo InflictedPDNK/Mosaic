@@ -8,6 +8,13 @@ import java.io.IOException;
 /**
  * Created by pnovodon on 11/09/2016.
  */
+
+/**
+ * Extends synchronous {@link BaseTransformPipe} to allow async processing of data.
+ * {@link #endTransformData(DataDescriptor)} must be called from transform's other thread in order
+ * to propagate data further downstream.
+ * @param <T> type of {@link DataDescriptor}
+ */
 public abstract class BaseAsyncTransformPipe<T extends DataDescriptor> extends BaseTransformPipe<T>
 {
     @Override

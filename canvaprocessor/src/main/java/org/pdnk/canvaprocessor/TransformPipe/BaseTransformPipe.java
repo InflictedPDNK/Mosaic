@@ -5,13 +5,23 @@ import android.util.Log;
 import org.pdnk.canvaprocessor.Common.BaseNode;
 import org.pdnk.canvaprocessor.Common.Constants;
 import org.pdnk.canvaprocessor.Common.Consumable;
+import org.pdnk.canvaprocessor.Common.Node;
 import org.pdnk.canvaprocessor.Data.DataDescriptor;
 import org.pdnk.canvaprocessor.Feedback.CompletedFeedback;
+import org.pdnk.canvaprocessor.Graph.Graph;
 
 import java.io.IOException;
 
 /**
  * Created by pnovodon on 9/09/2016.
+ */
+
+/**
+ * Base synchronous transform pipe implementation. Runs asynchronously only from a call to {@link Node#run()},
+ * normally as a consequene of call to {@link Graph#runLast()}.</br>
+ * This implementation does not cache input or output data, but allows overriding this by subclasses.<br/>
+ * {@link #process(DataDescriptor)} can be overridden by subclasses to creat async version of node
+ * @param <T> type of {@link DataDescriptor}
  */
 public abstract class BaseTransformPipe<T extends DataDescriptor> extends BaseNode implements TransformPipe
 {
@@ -140,7 +150,7 @@ public abstract class BaseTransformPipe<T extends DataDescriptor> extends BaseNo
     }
 
     @Override
-    public void addConsumer(Consumable consumableNode)
+    public void setConsumer(Consumable consumableNode)
     {
         consumer = consumableNode;
     }

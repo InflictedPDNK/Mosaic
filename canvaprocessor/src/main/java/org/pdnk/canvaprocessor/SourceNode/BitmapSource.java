@@ -11,10 +11,19 @@ import java.nio.ByteBuffer;
 /**
  * Created by pnovodon on 10/09/2016.
  */
+
+/**
+ * Bitmap source allocates a raw byte buffer and clones Bitmap raw data into it to prevent original
+ * bitmap in-place modification.
+ */
 public class BitmapSource extends BaseSourceNode<ImageDataDescriptor>
 {
     private Bitmap inputBitmap;
 
+    /**
+     *
+     * @param bitmap instance of external bitmap (will not be modified)
+     */
     public BitmapSource(@NonNull Bitmap bitmap)
     {
         inputBitmap = bitmap;

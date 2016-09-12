@@ -3,6 +3,10 @@ package org.pdnk.canvaprocessor.Data;
 /**
  * Created by pnovodon on 9/09/2016.
  */
+
+/**
+ * Image data descriptor. Used in image processing nodes.
+ */
 public class ImageDataDescriptor extends DataDescriptor
 {
     private int height;

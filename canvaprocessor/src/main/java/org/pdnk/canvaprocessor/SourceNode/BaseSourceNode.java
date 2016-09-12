@@ -13,6 +13,12 @@ import java.io.IOException;
 /**
  * Created by pnovodon on 9/09/2016.
  */
+
+/**
+ * Base implementation of Source node never caches input or output data.<br/>
+ * Runs in a private worker thread and maintains its existence.
+ * @param <T> type of {@link DataDescriptor}
+ */
 abstract class BaseSourceNode<T extends DataDescriptor> extends BaseNode implements SourceNode
 {
     Consumable consumer;
@@ -60,7 +66,7 @@ abstract class BaseSourceNode<T extends DataDescriptor> extends BaseNode impleme
 
 
     @Override
-    public final void addConsumer(Consumable consumableNode)
+    public final void setConsumer(Consumable consumableNode)
     {
         consumer = consumableNode;
     }

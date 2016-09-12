@@ -12,6 +12,11 @@ import java.util.LinkedList;
 /**
  * Created by pnovodon on 8/09/2016.
  */
+
+/**
+ * Core descriptor of Graph. Contains default values data required for any graph operations.
+ * Can be used in cloning or graph duplication
+ */
 class GraphDescriptor
 {
     SourceNode source;

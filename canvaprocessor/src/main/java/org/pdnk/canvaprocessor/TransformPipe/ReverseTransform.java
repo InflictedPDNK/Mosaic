@@ -7,6 +7,10 @@ import java.io.IOException;
 /**
  * Created by pnovodon on 9/09/2016.
  */
+
+/**
+ * The transform reverses the order of incoming data buffer
+ */
 public class ReverseTransform extends BaseTransformPipe<DataDescriptor>
 {
     @Override

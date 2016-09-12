@@ -7,6 +7,10 @@ import java.io.IOException;
 /**
  * Created by pnovodon on 9/09/2016.
  */
+
+/**
+ * Null transform for compliance testing
+ */
 public class NullTransform extends BaseTransformPipe<DataDescriptor>
 {
     @Override

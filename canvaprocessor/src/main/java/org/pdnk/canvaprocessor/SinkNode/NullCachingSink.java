@@ -8,6 +8,10 @@ import java.nio.ByteBuffer;
 /**
  * Created by pnovodon on 9/09/2016.
  */
+
+/**
+ * Null renderer. Simply caches the input data but does not perform any rendering.
+ */
 public class NullCachingSink extends BaseSinkNode<DataDescriptor>
 {
 

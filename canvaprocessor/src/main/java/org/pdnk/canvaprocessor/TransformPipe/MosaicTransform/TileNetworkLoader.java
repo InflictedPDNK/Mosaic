@@ -11,6 +11,10 @@ import java.nio.ByteBuffer;
 /**
  * Created by pnovodon on 12/09/2016.
  */
+
+/**
+ * Network mosaic image loader for Universal Image Loader library
+ */
 class TileNetworkLoader extends SimpleImageLoadingListener
 {
     private final MosaicNetworkTransform mosaicNetworkTransform;
@@ -42,6 +46,7 @@ class TileNetworkLoader extends SimpleImageLoadingListener
     @Override
     public void onLoadingFailed(String imageUri, View view, FailReason failReason)
     {
+        //remove color record so the equest is re-issues in the future
         mosaicNetworkTransform.cachedBitmaps.remove(loadingColor);
 
         if (mosaicNetworkTransform.isPartialCompletionEnabled())
@@ -57,6 +62,7 @@ class TileNetworkLoader extends SimpleImageLoadingListener
         }
         else
         {
+            //signal end of transform is failed
             mosaicNetworkTransform.endTransformData(null);
         }
     }
