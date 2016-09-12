@@ -34,8 +34,16 @@ As for the application, I didn't not focus specifically on the UI, but I wanted 
 5. Undo/Redo
 
 
-###Finally
+##Finally
 I hope that you will understand my motivation. I'll recap: I designed the app this wat not only because I want to join your company, but also because engineering awesome robust solutions is in my blood. I really wish you enjoy it and I'm looking forward to meeting you soon!
 
 
 PS. A little excuse me for not clean code everywhere. Especially in processing algorithms. When I get carried away with optimisations I can end up with such horrible lines as index calculation. Of course, if algo goes to more suitable environment (RenderScript, for instance) it will be much neater.
+
+####Spent time break-down
+4h on CanvaProcessor proto
+4h on App UI
+8h on processes, networking, business logic
+3h polishing, bugfixing
+2h documentation and readme
+
