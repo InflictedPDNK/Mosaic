@@ -77,6 +77,8 @@ public class SurfaceRenderer extends BaseSinkNode<ImageDataDescriptor>
             data.getData().rewind();
         }
 
+        double ar = (double)renderBitmap.getHeight()/ (double)renderBitmap.getWidth();
+
         if(firstRender)
         {
             int mosaicMatrixHeight = data.getHeight()/effectHeight;
@@ -85,8 +87,10 @@ public class SurfaceRenderer extends BaseSinkNode<ImageDataDescriptor>
 
             int step = 0;
 
-            Rect srcR = new Rect(0, 0, data.getWidth(), effectHeight);
-            Rect dstR = new Rect(srcR);
+
+            Rect srcR = null;
+            Rect dstR = null;
+            double heightRatio = 1;
 
 
             while (++step <= mosaicMatrixHeight)
@@ -96,14 +100,36 @@ public class SurfaceRenderer extends BaseSinkNode<ImageDataDescriptor>
                 if (canvas == null)
                     return;
 
+                if(srcR == null)
+                {
+                    int targetWidth = canvas.getWidth();
+                    int targetHeight = (int) (targetWidth * ar);
+                    int y = 0;
+                    int x = 0;
+
+                    if(targetHeight <= canvas.getHeight())
+                    {
+                        y = (canvas.getHeight() - targetHeight) / 2;
+                    }else
+                    {
+                        targetHeight = canvas.getHeight();
+                        targetWidth = (int) (targetHeight/ ar);
+                        x = (canvas.getWidth() - targetWidth) / 2;
+                    }
+
+                    heightRatio = (double)targetHeight / (double) renderBitmap.getHeight();
+                    srcR = new Rect(0, 0, data.getWidth(), effectHeight);
+                    dstR = new Rect(x, y, x + targetWidth, (int) (y + effectHeight * heightRatio));
+                }
                 canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+
 
                 canvas.drawBitmap(renderBitmap, srcR, dstR, null);
 
                 holder.unlockCanvasAndPost(canvas);
 
                 srcR.bottom += effectHeight;
-                dstR.bottom += effectHeight;
+                dstR.bottom += effectHeight * heightRatio;
 
                 try
                 {
@@ -120,7 +146,21 @@ public class SurfaceRenderer extends BaseSinkNode<ImageDataDescriptor>
             Canvas canvas = holder.lockCanvas();
             if (canvas != null)
             {
-                canvas.drawBitmap(renderBitmap, 0, 0, null);
+                int targetWidth = canvas.getWidth();
+                int targetHeight = (int) (targetWidth * ar);
+                int y = 0, x = 0;
+                if(targetHeight < canvas.getHeight())
+                {
+                    y = (canvas.getHeight() - targetHeight) / 2;
+                }else
+                {
+                    targetHeight = canvas.getHeight();
+                    targetWidth = (int) (targetHeight/ ar);
+                    x = (canvas.getWidth() - targetWidth) / 2;
+                }
+
+                Rect dstRect = new Rect(x, y, targetWidth + x, targetHeight + y);
+                canvas.drawBitmap(renderBitmap, null, dstRect, null);
                 holder.unlockCanvasAndPost(canvas);
             }
         }

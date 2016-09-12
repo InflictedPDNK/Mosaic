@@ -36,7 +36,10 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
     ImageDataDescriptor inputData;
 
 
-    public MosaicNetworkTransform(Context context, int tileWidth, int tileHeight, String apiEndpointIP)
+    public MosaicNetworkTransform(Context context,
+                                  int tileWidth,
+                                  int tileHeight,
+                                  String apiEndpointIP)
     {
         this.context = context;
         this.tileWidth = tileWidth;
@@ -55,16 +58,16 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
         analysing.set(true);
         inputData = data;
 
-        mosaicMatrixWidth = data.getWidth()/tileWidth;
-        if(data.getWidth() % tileWidth != 0)
+        mosaicMatrixWidth = data.getWidth() / tileWidth;
+        if (data.getWidth() % tileWidth != 0)
             ++mosaicMatrixWidth;
-        mosaicMatrixHeight = data.getHeight()/tileHeight;
-        if(data.getHeight() % tileHeight != 0)
+        mosaicMatrixHeight = data.getHeight() / tileHeight;
+        if (data.getHeight() % tileHeight != 0)
             ++mosaicMatrixHeight;
 
         int stride = data.getWidth() * 4;
 
-        tileColors = new int[mosaicMatrixWidth*mosaicMatrixHeight];
+        tileColors = new int[mosaicMatrixWidth * mosaicMatrixHeight];
         Tile[] tileRow = new Tile[mosaicMatrixWidth];
 
         byte[] input = data.getData().array();
@@ -75,20 +78,20 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
 
         downloadRequestCounter.set(0);
 
-        for(int i = 0; i< input.length - 4  && running.get(); i += 4)
+        for (int i = 0; i < input.length - 4 && running.get(); i += 4)
         {
-            scanline = i/stride / tileHeight;
+            scanline = i / stride / tileHeight;
 
-            if(currentScanline != scanline)
+            if (currentScanline != scanline)
             {
-                avgIndex = (currentScanline * mosaicMatrixWidth );
+                avgIndex = (currentScanline * mosaicMatrixWidth);
                 mapAverageColors(tileRow, avgIndex);
                 currentScanline = scanline;
             }
-            avgIndex = ((i >> 2) % data.getWidth() ) / tileWidth;
+            avgIndex = ((i >> 2) % data.getWidth()) / tileWidth;
 
             tile = tileRow[avgIndex];
-            if(tile == null)
+            if (tile == null)
             {
                 tile = new Tile();
                 tileRow[avgIndex] = tile;
@@ -102,7 +105,7 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
 
         mapAverageColors(tileRow, scanline * mosaicMatrixWidth);
 
-        if(downloadRequestCounter.get() == 0  && running.get())
+        if (downloadRequestCounter.get() == 0 && running.get())
             buildMosaic();
 
         analysing.set(false);
@@ -111,16 +114,16 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
     private void mapAverageColors(Tile[] tileRow, int tileColorsStride)
     {
         int avgColor;
-        for(int j = 0; j< mosaicMatrixWidth && running.get(); ++j)
+        for (int j = 0; j < mosaicMatrixWidth && running.get(); ++j)
         {
-            avgColor = (tileRow[j].r/tileRow[j].tilePixelCount) << 16 |
-                    (tileRow[j].g/tileRow[j].tilePixelCount) << 8 |
-                    (tileRow[j].b/tileRow[j].tilePixelCount);
+            avgColor = (tileRow[j].r / tileRow[j].tilePixelCount) << 16 |
+                    (tileRow[j].g / tileRow[j].tilePixelCount) << 8 |
+                    (tileRow[j].b / tileRow[j].tilePixelCount);
 
             tileColors[tileColorsStride + j] = avgColor;
             Integer color = avgColor;
 
-            if(!cachedBitmaps.containsKey(color))
+            if (!cachedBitmaps.containsKey(color))
             {
                 cachedBitmaps.put(color, null);
                 downloadRequestCounter.incrementAndGet();
@@ -128,7 +131,8 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
                                                                   apiEndpointIP,
                                                                   tileWidth,
                                                                   tileHeight,
-                                                                  avgColor), new TileNetworkLoader(this, color));
+                                                                  avgColor),
+                                                    new TileNetworkLoader(this, color));
             }
             tileRow[j].reset();
         }
@@ -136,28 +140,28 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
 
     void buildMosaic()
     {
-        ByteBuffer target = ByteBuffer.allocate(inputData.getData().capacity());
-
         int x;
-        for (int i = 0; i < mosaicMatrixWidth* mosaicMatrixHeight && running.get(); ++i)
+        for (int i = 0; i < mosaicMatrixWidth * mosaicMatrixHeight && running.get(); ++i)
         {
             int tileColor = tileColors[i];
             ByteBuffer b = cachedBitmaps.get(tileColor);
-            if(b != null)
+            if (b != null)
             {
-                x = (inputData.getWidth() * tileHeight * (i/mosaicMatrixWidth) + tileWidth * (i % mosaicMatrixWidth)) * 4;
+                x = (inputData.getWidth() * tileHeight * (i / mosaicMatrixWidth) + tileWidth * (i % mosaicMatrixWidth)) * 4;
 
-                for(int j = 0; j < b.array().length; j += 4)
+                for (int j = 0; j < b.array().length; j += 4)
                 {
-                    int line = j/4 / tileWidth;
-                    int idx = (line * inputData.getWidth() * 4 + x) +  ((j/4) % tileWidth) * 4;
-                    if((tileWidth * (i % mosaicMatrixWidth)  + ((j/4) % tileWidth) ) <  ((inputData.getWidth()) ) &&
-                            tileHeight * (i/mosaicMatrixWidth) + line < inputData.getHeight())
+                    int line = j / 4 / tileWidth;
+                    int idx = (line * inputData.getWidth() * 4 + x) + ((j / 4) % tileWidth) * 4;
+
+                    //check for clipping
+                    if ((tileWidth * (i % mosaicMatrixWidth) + ((j / 4) % tileWidth)) < ((inputData.getWidth())) &&
+                            tileHeight * (i / mosaicMatrixWidth) + line < inputData.getHeight())
                     {
-                        target.array()[idx] = b.array()[j];
-                        target.array()[idx + 1] = b.array()[j + 1];
-                        target.array()[idx + 2] = b.array()[j + 2];
-                        target.array()[idx + 3] = b.array()[j + 3];
+                        inputData.getData().array()[idx] = b.array()[j];
+                        inputData.getData().array()[idx + 1] = b.array()[j + 1];
+                        inputData.getData().array()[idx + 2] = b.array()[j + 2];
+                        inputData.getData().array()[idx + 3] = b.array()[j + 3];
                     }
                 }
 
@@ -165,10 +169,8 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
             }
         }
 
-        if(running.get())
+        if (running.get())
         {
-            inputData.setData(target);
-
             endTransformData(inputData);
         }
     }
