@@ -5,49 +5,48 @@
                 android:padding="10dp">
 
     <TextView
+        android:id="@+id/dlgTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorAccent"
-        android:textSize="16sp"
+        android:layout_centerHorizontal="true"
         android:layout_marginRight="5dp"
         android:text="@string/message_title"
-        android:layout_centerHorizontal="true"
-        android:textStyle="bold"
-        android:id="@+id/dlgTitle"/>
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
     <View
+        android:id="@+id/titleSeparator"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
-        android:background="@color/colorAccent"
         android:layout_below="@+id/dlgTitle"
-        android:id="@+id/titleSeparator"
-        android:layout_margin="5dp"/>
+        android:layout_margin="5dp"
+        android:background="@color/colorAccent"/>
 
 
     <TextView
+        android:id="@+id/messageText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorAccent"
-        android:textSize="14sp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
         android:layout_below="@id/titleSeparator"
-        android:id="@+id/messageText"/>
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/colorAccent"
+        android:textSize="14sp"/>
 
     <TextView
         android:id="@+id/dlgCancelBtn"
         android:layout_width="70dp"
         android:layout_height="40dp"
-        android:gravity="center"
-        android:textColor="@color/colorAccent"
-        android:text="Ok"
-        android:textSize="12sp"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentRight="true"
         android:layout_below="@id/messageText"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
         android:includeFontPadding="false"
+        android:text="Ok"
+        android:textColor="@color/colorAccent"
+        android:textSize="12sp"
         />
-
-
 
 
 </RelativeLayout>

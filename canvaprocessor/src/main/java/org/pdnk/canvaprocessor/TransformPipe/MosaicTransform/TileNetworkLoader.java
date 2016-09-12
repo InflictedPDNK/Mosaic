@@ -42,6 +42,8 @@ class TileNetworkLoader extends SimpleImageLoadingListener
     @Override
     public void onLoadingFailed(String imageUri, View view, FailReason failReason)
     {
+        mosaicNetworkTransform.cachedBitmaps.remove(loadingColor);
+
         if (mosaicNetworkTransform.isPartialCompletionEnabled())
         {
             mosaicNetworkTransform.setPartiallyCompleted();

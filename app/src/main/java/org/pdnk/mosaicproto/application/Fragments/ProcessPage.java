@@ -79,6 +79,9 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
     @BindView(R.id.statusMessage)
     TextView statusMessage;
 
+    @BindView(R.id.spinner)
+    View spinner;
+
     private Graph graph;
     private long elapsedTime;
 
@@ -175,6 +178,7 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
     {
         if(processing)
         {
+            spinner.setVisibility(View.GONE);
             imageSurface.setVisibility(View.INVISIBLE);
             imageOriginal.setVisibility(View.VISIBLE);
             resetControls();
@@ -185,6 +189,7 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
             }
         }else
         {
+            spinner.setVisibility(View.VISIBLE);
             imageOriginal.setVisibility(View.INVISIBLE);
             imageSurface.setVisibility(View.VISIBLE);
 
@@ -341,6 +346,8 @@ public class ProcessPage extends BaseGenericFragment<ProcessPageData>
 
     void onMosaicCompleted(CompletedFeedback completedFeedback)
     {
+        spinner.setVisibility(View.GONE);
+
         if (completedFeedback.isSuccessful())
         {
             if(completedFeedback.isPartial())

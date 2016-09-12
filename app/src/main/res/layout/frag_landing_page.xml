@@ -2,8 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:clickable="true"
                 android:background="@color/colorPrimary"
+                android:clickable="true"
                 android:padding="10dp">
 
 
@@ -29,6 +29,7 @@
         />
 
     <TextView
+        android:id="@+id/selectImagelink"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -36,7 +37,6 @@
         android:text="@string/select_image_link"
         android:textColor="@color/colorAccent"
         android:textSize="22sp"
-        android:id="@+id/selectImagelink"
         />
 
     <TextView

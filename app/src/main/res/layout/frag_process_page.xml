@@ -5,6 +5,8 @@
                 android:background="@color/colorPrimary"
                 android:clickable="true">
 
+
+
     <LinearLayout
         android:id="@+id/buttonBlock"
         android:layout_width="match_parent"
@@ -42,34 +44,49 @@
             android:src="@drawable/ic_share_black_24dp"/>
     </LinearLayout>
 
+
+
     <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="4dp"
+        android:layout_alignTop="@id/buttonBlock"
         android:indeterminate="false"
         android:max="100"
-        android:layout_alignTop="@id/buttonBlock"
-        android:id="@+id/progress"
         android:progress="30"
-        style="?android:attr/progressBarStyleHorizontal"
         android:progressDrawable="@drawable/progress"
         />
 
     <TextView
+        android:id="@+id/statusMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:alpha="0.5"
         android:textColor="@color/colorAccent"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/statusMessage"/>
+        android:textSize="10dp"/>
+
+    <ProgressBar
+        android:id="@+id/spinner"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_toLeftOf="@id/statusMessage"
+        android:layout_marginRight="5dp"
+        android:layout_alignBottom="@+id/statusMessage"
+        android:indeterminate="true"
+        android:indeterminateBehavior="cycle"
+        android:visibility="gone"/>
+
     <ImageView
         android:id="@+id/imageOriginal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/buttonBlock"
         android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        android:layout_above="@id/buttonBlock"/>
+        android:scaleType="fitCenter"/>
 
     <SurfaceView
         android:id="@+id/imageSurface"

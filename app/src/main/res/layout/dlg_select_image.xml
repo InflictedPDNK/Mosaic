@@ -5,55 +5,55 @@
                 android:padding="10dp">
 
     <TextView
+        android:id="@+id/dlgTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorAccent"
-        android:textSize="16sp"
+        android:layout_centerHorizontal="true"
         android:layout_marginRight="5dp"
         android:text="@string/select_image_title"
-        android:layout_centerHorizontal="true"
-        android:textStyle="bold"
-        android:id="@+id/dlgTitle"/>
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
     <View
+        android:id="@+id/titleSeparator"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
-        android:background="@color/colorAccent"
         android:layout_below="@+id/dlgTitle"
-        android:id="@+id/titleSeparator"
-        android:layout_margin="5dp"/>
-
+        android:layout_margin="5dp"
+        android:background="@color/colorAccent"/>
 
 
     <TextView
         android:id="@+id/galleryBtn"
-        android:background="@drawable/dialog_item_bkg"
         android:layout_width="120dp"
         android:layout_height="40dp"
-        android:gravity="center"
-        android:textColor="@color/colorAccent"
-        android:text="@string/pick_from_gallery"
-        android:textSize="12sp"
-        android:layout_marginTop="30dp"
-        android:layout_below="@id/titleSeparator"
         android:layout_alignParentRight="true"
+        android:layout_below="@id/titleSeparator"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/dialog_item_bkg"
+        android:gravity="center"
         android:includeFontPadding="false"
+        android:text="@string/pick_from_gallery"
+        android:textColor="@color/colorAccent"
+        android:textSize="12sp"
         />
 
     <TextView
         android:id="@+id/diskBtn"
-        android:background="@drawable/dialog_item_bkg"
         android:layout_width="120dp"
         android:layout_height="40dp"
-        android:gravity="center"
-        android:text="@string/load_from_disk"
-        android:textSize="12sp"
-        android:textColor="@color/colorAccent"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/titleSeparator"
         android:layout_marginRight="20dp"
         android:layout_marginTop="30dp"
-        android:layout_below="@id/titleSeparator"
         android:layout_toLeftOf="@id/dlgCancelBtn"
-        android:layout_alignParentLeft="true"
+        android:background="@drawable/dialog_item_bkg"
+        android:gravity="center"
         android:includeFontPadding="false"
+        android:text="@string/load_from_disk"
+        android:textColor="@color/colorAccent"
+        android:textSize="12sp"
         />
 
 </RelativeLayout>

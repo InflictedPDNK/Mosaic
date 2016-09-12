@@ -6,81 +6,80 @@
                 android:padding="10dp">
 
     <TextView
+        android:id="@+id/dlgTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorAccent"
-        android:textSize="16sp"
+        android:layout_centerHorizontal="true"
         android:layout_marginRight="5dp"
         android:text="@string/settings_title"
-        android:layout_centerHorizontal="true"
-        android:textStyle="bold"
-        android:id="@+id/dlgTitle"/>
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
     <View
+        android:id="@+id/titleSeparator"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
-        android:background="@color/colorAccent"
         android:layout_below="@+id/dlgTitle"
-        android:id="@+id/titleSeparator"
-        android:layout_margin="5dp"/>
+        android:layout_margin="5dp"
+        android:background="@color/colorAccent"/>
 
 
     <TextView
+        android:id="@+id/tileSizeLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorAccent"
-        android:textSize="14sp"
-        android:text="@string/tile_size_label"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="30dp"
         android:layout_below="@id/titleSeparator"
+        android:layout_marginBottom="30dp"
+        android:layout_marginTop="20dp"
         android:labelFor="@+id/tileSizeEdit"
-        android:id="@+id/tileSizeLabel"/>
+        android:text="@string/tile_size_label"
+        android:textColor="@color/colorAccent"
+        android:textSize="14sp"/>
 
     <EditText
+        android:id="@+id/tileSizeEdit"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@id/tileSizeLabel"
-        android:inputType="number"
-        android:textColor="@color/colorAction"
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@id/tileSizeLabel"
-        android:id="@+id/tileSizeEdit"/>
+        android:inputType="number"
+        android:textColor="@color/colorAction"/>
 
     <TextView
+        android:id="@+id/apiEndpointLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorAccent"
-        android:textSize="14sp"
-        android:text="@string/api_enpoint_label"
-        android:layout_marginBottom="10dp"
         android:layout_below="@id/tileSizeLabel"
+        android:layout_marginBottom="10dp"
         android:labelFor="@+id/apiEndpointEdit"
-        android:id="@+id/apiEndpointLabel"/>
+        android:text="@string/api_enpoint_label"
+        android:textColor="@color/colorAccent"
+        android:textSize="14sp"/>
 
     <EditText
+        android:id="@+id/apiEndpointEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@id/apiEndpointLabel"
-        android:inputType="textUri"
-        android:textColor="@color/colorAction"
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@id/apiEndpointLabel"
-        android:id="@+id/apiEndpointEdit"/>
+        android:inputType="textUri"
+        android:textColor="@color/colorAction"/>
 
     <TextView
         android:id="@+id/dlgOkBtn"
         android:layout_width="70dp"
         android:layout_height="40dp"
-        android:gravity="center"
-        android:textColor="@color/colorAccent"
-        android:text="Ok"
-        android:textSize="12sp"
-        android:layout_marginTop="20dp"
         android:layout_alignParentRight="true"
         android:layout_below="@id/apiEndpointLabel"
-        android:includeFontPadding="false"/>
-
-
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="Ok"
+        android:textColor="@color/colorAccent"
+        android:textSize="12sp"/>
 
 
 </RelativeLayout>

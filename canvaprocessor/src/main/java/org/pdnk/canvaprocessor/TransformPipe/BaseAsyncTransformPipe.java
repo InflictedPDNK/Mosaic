@@ -47,14 +47,14 @@ public abstract class BaseAsyncTransformPipe<T extends DataDescriptor> extends B
                 }
 
                 if (!Thread.currentThread().isInterrupted())
-                    consumer.consume(data);
-
-                if (!Thread.currentThread().isInterrupted())
                 {
                     completedFeedbackListener.run(new CompletedFeedback(true,
                                                                         partiallyCompleted,
                                                                         null));
                 }
+
+                if (!Thread.currentThread().isInterrupted())
+                    consumer.consume(data);
             }
         } catch (ClassCastException e)
         {
