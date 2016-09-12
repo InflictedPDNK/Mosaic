@@ -47,3 +47,5 @@ PS. A little excuse me for not clean code everywhere. Especially in processing a
 3h polishing, bugfixing
 2h documentation and readme
 
+##Binary
+I included debug APK in the repo as well. Look under app/build/output/
