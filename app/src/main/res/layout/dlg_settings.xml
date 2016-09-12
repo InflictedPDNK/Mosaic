@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:padding="10dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp"
+        android:layout_marginRight="5dp"
+        android:text="@string/settings_title"
+        android:layout_centerHorizontal="true"
+        android:textStyle="bold"
+        android:id="@+id/dlgTitle"/>
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:background="@color/colorAccent"
+        android:layout_below="@+id/dlgTitle"
+        android:id="@+id/titleSeparator"
+        android:layout_margin="5dp"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorAccent"
+        android:textSize="14sp"
+        android:text="@string/tile_size_label"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="30dp"
+        android:layout_below="@id/titleSeparator"
+        android:labelFor="@+id/tileSizeEdit"
+        android:id="@+id/tileSizeLabel"/>
+
+    <EditText
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/tileSizeLabel"
+        android:inputType="number"
+        android:textColor="@color/colorAction"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/tileSizeLabel"
+        android:id="@+id/tileSizeEdit"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorAccent"
+        android:textSize="14sp"
+        android:text="@string/api_enpoint_label"
+        android:layout_marginBottom="10dp"
+        android:layout_below="@id/tileSizeLabel"
+        android:labelFor="@+id/apiEndpointEdit"
+        android:id="@+id/apiEndpointLabel"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/apiEndpointLabel"
+        android:inputType="textUri"
+        android:textColor="@color/colorAction"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/apiEndpointLabel"
+        android:id="@+id/apiEndpointEdit"/>
+
+    <TextView
+        android:id="@+id/dlgOkBtn"
+        android:layout_width="70dp"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:textColor="@color/colorAccent"
+        android:text="Ok"
+        android:textSize="12sp"
+        android:layout_marginTop="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/apiEndpointLabel"
+        android:includeFontPadding="false"/>
+
+
+
+
+</RelativeLayout>

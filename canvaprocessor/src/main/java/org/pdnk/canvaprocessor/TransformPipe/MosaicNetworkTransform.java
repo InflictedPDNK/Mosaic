@@ -2,6 +2,7 @@ package org.pdnk.canvaprocessor.TransformPipe;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -21,9 +22,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDescriptor>
 {
     private final Context context;
-    private final int tileWidth;
-    private final int tileHeight;
-    private final String apiEndpointIP;
+    private final String apiQuery = "%s:8765/color/%d/%d/%06x";
+    private int tileWidth;
+    private int tileHeight;
+    private String apiEndpointIP;
 
     private volatile boolean analysing;
     private int mosaicMatrixWidth;
@@ -33,6 +35,8 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
 
     private int[] tileColors;
     ImageDataDescriptor inputData;
+
+
 
     private class Tile
     {
@@ -151,7 +155,7 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
                     {
                         cachedBitmaps.put(color, null);
                         downloadRequestCounter.incrementAndGet();
-                        ImageLoader.getInstance().loadImage(String.format("http://%s/color/%d/%d/%06x",
+                        ImageLoader.getInstance().loadImage(String.format(apiQuery,
                                                                           apiEndpointIP,
                                                                           tileWidth,
                                                                           tileHeight,
@@ -190,7 +194,7 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
             {
                 cachedBitmaps.put(color, null);
                 downloadRequestCounter.incrementAndGet();
-                ImageLoader.getInstance().loadImage(String.format("http://%s/color/%d/%d/%06x",
+                ImageLoader.getInstance().loadImage(String.format(apiQuery,
                                                                   apiEndpointIP,
                                                                   tileWidth,
                                                                   tileHeight,
@@ -275,5 +279,16 @@ public class MosaicNetworkTransform extends BaseAsyncTransformPipe<ImageDataDesc
         downloadRequestCounter = new AtomicInteger(0);
         cachedBitmaps = new HashMap<>();
 
+    }
+
+    public void setTileSize(int width, int height)
+    {
+        tileWidth = width;
+        tileHeight = height;
+    }
+
+    public void setAPIendpoint(@NonNull String APIendpoint)
+    {
+        this.apiEndpointIP = APIendpoint;
     }
 }

@@ -15,4 +15,15 @@
     <string name="status_processing">Processing...</string>
     <string name="status_image_needed">Select image to process</string>
     <string name="status_ready">Ready</string>
+    <string name="settings_title">Settings</string>
+    <string name="tile_size_label">Tile size</string>
+    <string name="api_enpoint_label">API enpoint IP</string>
+    <string name="shared_pref_loc">MosaicSharedPref</string>
+    <string name="set_tile_size">TILE_SIZE</string>
+    <string name="set_api_ip">API_IP</string>
+    <string name="default_api_ip">http://10.0.2.2</string>
+    <string name="set_first_launch">FIRST_LAUNCH</string>
+    <string name="extra_restart">RESTART</string>
+
+    <integer name="default_tile_size">32</integer>
 </resources>

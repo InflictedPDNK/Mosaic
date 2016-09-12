@@ -75,7 +75,7 @@ public class BaseGenericFragment<DataType extends FragmentData> extends DialogFr
         wasSaved = false;
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        setHasOptionsMenu(true);
+        setHasOptionsMenu(false);
 
         if(dataLoadListener != null)
         {
@@ -85,7 +85,7 @@ public class BaseGenericFragment<DataType extends FragmentData> extends DialogFr
                 fragmentData = (DataType)dataLoadListener.loadFragmentData(this);
             }catch (Exception e)
             {
-                Log.e("TechRadar", "BaseGenericFragment onCreate: you must pass the appropriate subclass of FragmentData to the fragment");
+                Log.e("Mosaic", "BaseGenericFragment onCreate: you must pass the appropriate subclass of FragmentData to the fragment");
                 e.printStackTrace();
             }
 

@@ -9,6 +9,7 @@ import org.pdnk.mosaicproto.application.Fragments.Data.ConfirmDlgData;
 import org.pdnk.mosaicproto.application.Fragments.Data.FragmentData;
 import org.pdnk.mosaicproto.application.Fragments.Data.MessageDlgData;
 import org.pdnk.mosaicproto.application.Fragments.Data.ProcessPageData;
+import org.pdnk.mosaicproto.application.Fragments.Data.SettingsData;
 
 import java.util.LinkedHashMap;
 
@@ -105,6 +106,13 @@ public final class FragmentFactory implements BaseGenericFragment.OnFragmentDeta
     public BaseGenericFragment constructMessageDialog(MessageDlgData data)
     {
         BaseGenericFragment f =  new MessageDialog();
+        showDialog(f, data);
+        return f;
+    }
+
+    public BaseGenericFragment constructSettingsDialog(SettingsData data)
+    {
+        BaseGenericFragment f =  new SettingsDialog();
         showDialog(f, data);
         return f;
     }
